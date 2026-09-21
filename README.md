@@ -18,7 +18,8 @@ Next-generation, high-authority certification engine, verification portal, and C
 4. **Zero-Dependency Vector QR Generator**:
    - Pixel-perfect QR code drawn directly on Canvas.
    - Encodes a compact, cryptographically signed token (`sig`) into the verification URL.
-5. **Official Verification Landing Page (`/cert/iq/v`)**:
+5. **Official Verification Landing Page (`/cert/iq/v/<token>`)**:
+   - SEO-friendly path URLs (legacy `?d=` permanently redirects to path form).
    - Shows verified security badge, bearer name, IQ score, percentile ranking, interactive radar chart, dimension definitions, and certificate image.
    - Integrated with **ShareKit** (`<social-share>`) for 1-click social sharing to Twitter/X, Facebook, WhatsApp, Telegram, and Copy Link.
    - High-converting Call-To-Action (CTA) leading visitors directly back to `https://www.arealme.com/iq/` to take the test.
@@ -62,7 +63,8 @@ npm run build
 npm run preview
 ```
 - Open `http://localhost:8787/test-harness.html` to test the IQ test host certificate modal.
-- Open `http://localhost:8787/cert/iq/v` to test the verification landing page.
+- Open `http://localhost:8787/cert/iq/v/<token>` to test the verification landing page (SEO path).
+- Legacy `?d=<token>` redirects to the path form.
 
 ### Deploy to Cloudflare
 ```bash

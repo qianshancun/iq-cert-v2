@@ -9,7 +9,7 @@
     "binding": "ASSETS",
     "html_handling": "auto-trailing-slash",
     "not_found_handling": "single-page-application",
-    "run_worker_first": ["/cert/iq/v*", "/cert/iq/api/*", "/cert/iq-cert.js"]
+    "run_worker_first": true
   },
   "routes": [
     {

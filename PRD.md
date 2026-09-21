@@ -158,7 +158,9 @@ ARealMe 官方智商测试（`https://www.arealme.com/iq/`）在 2026 年进行�
   * `sig`: 基于服务端共享秘钥计算的 HMAC-SHA256 截断校验码（前 8 位十六进制）
 * **编码传输**：将 JSON 字符串通过 `Base64URL` 紧凑序列化为字符串 `d`。
 * **最终 URL 结构**：
-  `https://www.arealme.com/cert/iq/v?d=eyJpZCI6ImU0ZjhiMiIsIm4...`
+  `https://www.arealme.com/cert/iq/v/<base64url-token>`
+  
+  Legacy query form `?d=<token>` is permanently redirected (301) to the path form.
 
 ---
 

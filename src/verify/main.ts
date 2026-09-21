@@ -1,4 +1,4 @@
-import { DIMENSION_LABELS } from '../shared/constants';
+import { DIMENSION_LABELS, extractTokenFromLocation } from '../shared/constants';
 import { decodeCertificateToken } from '../shared/token';
 import type { IQCertDesign, IQCertificatePayload } from '../shared/types';
 import { drawRadarChart, getArchetype, normalizeDimensions } from '../engine/renderers/common';
@@ -86,20 +86,29 @@ class VerificationApp {
   }
 
   private async init(): Promise<void> {
-    const params = new URLSearchParams(window.location.search);
-    const token = params.get('d');
+    const token = extractTokenFromLocation(window.location.pathname, window.location.search);
+
+    // Legacy ?d=... → permanent SEO path redirect
+    const queryToken = new URLSearchParams(window.location.search).get('d');
+    if (queryToken && !window.location.pathname.match(/\/(?:v|verify)\/[^/?#]+/)) {
+      const pathBase = window.location.pathname.replace(/\/+$/, '') || '/cert/iq/v';
+      const seoPath = pathBase.endsWith('/v') || pathBase.endsWith('/verify')
+        ? `${pathBase}/${queryToken}`
+        : `/cert/iq/v/${queryToken}`;
+      window.history.replaceState(null, '', seoPath);
+    }
 
     if (token) {
       const res = await decodeCertificateToken(token);
       if (res.payload) {
         this.payload = res.payload;
         this.isAuthentic = res.valid;
-        this.currentLang = (this.payload.l === 'en') ? 'en' : 'cn';
+        this.currentLang = this.payload.l === 'en' ? 'en' : 'cn';
       } else {
         this.isAuthentic = false;
       }
     } else {
-      // Demo mode
+      // Demo mode when opened without a token
       this.payload = DEMO_PAYLOAD;
       this.isAuthentic = true;
       this.currentLang = 'cn';

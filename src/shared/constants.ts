@@ -141,4 +141,34 @@ export const BLACKLIST = [
   'NMSL',
 ];
 
+/** Canonical SEO-friendly verification base path (no trailing slash). */
 export const DEFAULT_VERIFY_BASE_URL = 'https://www.arealme.com/cert/iq/v';
+
+/**
+ * Build a path-based verification URL:
+ *   https://www.arealme.com/cert/iq/v/<base64url-token>
+ */
+export function buildVerifyUrl(token: string, baseUrl: string = DEFAULT_VERIFY_BASE_URL): string {
+  const base = baseUrl.replace(/\/+$/, '');
+  return `${base}/${token}`;
+}
+
+/**
+ * Extract a certificate token from either:
+ *   /cert/iq/v/<token>
+ *   /cert/iq/verify/<token>
+ *   ?d=<token>   (legacy query form)
+ */
+export function extractTokenFromLocation(
+  pathname: string,
+  search: string | URLSearchParams = ''
+): string | null {
+  const params =
+    typeof search === 'string' ? new URLSearchParams(search.startsWith('?') ? search.slice(1) : search) : search;
+  const queryToken = params.get('d');
+  if (queryToken) return queryToken;
+
+  const cleaned = pathname.replace(/\/+$/, '');
+  const match = cleaned.match(/\/(?:v|verify)\/([^/?#]+)$/);
+  return match?.[1] ? decodeURIComponent(match[1]) : null;
+}

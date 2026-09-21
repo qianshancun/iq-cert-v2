@@ -11,10 +11,8 @@ if (!fs.existsSync(verifyDist)) {
 
 console.log('🔨 Building Verification Web Application...');
 
-// 1. Copy index.html and styles.css
+// 1. Copy index.html and styles.css (asset paths use <base href="/cert/iq/">)
 let html = fs.readFileSync('src/verify/index.html', 'utf8');
-// Adjust script src from ./main.ts to ./main.js
-html = html.replace('src="./main.ts"', 'src="./main.js"');
 fs.writeFileSync(path.join(verifyDist, 'index.html'), html, 'utf8');
 fs.copyFileSync('src/verify/styles.css', path.join(verifyDist, 'styles.css'));
 

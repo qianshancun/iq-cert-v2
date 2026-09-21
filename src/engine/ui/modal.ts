@@ -1,4 +1,4 @@
-import { BLACKLIST, DEFAULT_VERIFY_BASE_URL } from '../../shared/constants';
+import { BLACKLIST, DEFAULT_VERIFY_BASE_URL, buildVerifyUrl } from '../../shared/constants';
 import { encodeCertificateToken } from '../../shared/token';
 import type { IQCertDesign, IQCertificatePayload, IQCertificateStartData } from '../../shared/types';
 import { renderAcademic } from '../renderers/academic';
@@ -346,7 +346,7 @@ export class CertificateModal {
 
     const token = await encodeCertificateToken(basePayload);
     const baseUrl = this.data.verifyBaseUrl || DEFAULT_VERIFY_BASE_URL;
-    this.verifyUrl = `${baseUrl}?d=${token}`;
+    this.verifyUrl = buildVerifyUrl(token, baseUrl);
 
     this.payload = {
       ...basePayload,
