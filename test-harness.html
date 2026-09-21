@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ARealMe IQ Test Simulator - 证书体系 2.0 联调测试台</title>
+  <style>
+    body {
+      background: #11141A;
+      color: #E5E7EB;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", sans-serif;
+      padding: 40px 20px;
+      line-height: 1.6;
+    }
+    .wrap {
+      max-width: 720px;
+      margin: 0 auto;
+      background: #181C24;
+      border: 1px solid #282E3B;
+      border-radius: 16px;
+      padding: 32px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+    h1 {
+      font-size: 24px;
+      margin-bottom: 8px;
+      color: #FFF;
+    }
+    p {
+      color: #9CA3AF;
+      font-size: 14px;
+      margin-bottom: 24px;
+    }
+    .score-box {
+      background: #0D1016;
+      border: 1px solid #202634;
+      border-radius: 12px;
+      padding: 24px;
+      text-align: center;
+      margin-bottom: 24px;
+    }
+    .score-val {
+      font-size: 72px;
+      font-weight: 900;
+      color: #10B981;
+      line-height: 1;
+    }
+    .score-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #F59E0B;
+      margin-top: 8px;
+    }
+    .dim-list {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin: 20px 0;
+      text-align: left;
+      font-size: 13px;
+    }
+    .dim-row {
+      background: #151922;
+      padding: 8px 12px;
+      border-radius: 8px;
+      display: flex;
+      justify-content: space-between;
+    }
+    .btn {
+      display: block;
+      width: 100%;
+      background: #10B981;
+      color: #064E3B;
+      font-size: 16px;
+      font-weight: 800;
+      padding: 14px;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn:hover {
+      background: #34D399;
+      transform: translateY(-1px);
+    }
+    .btn-secondary {
+      background: #282E3B;
+      color: #E5E7EB;
+      margin-top: 10px;
+    }
+    .btn-secondary:hover {
+      background: #384152;
+    }
+    .status-log {
+      margin-top: 24px;
+      padding: 12px;
+      background: #0D1016;
+      border-radius: 8px;
+      font-family: monospace;
+      font-size: 12px;
+      color: #10B981;
+      max-height: 150px;
+      overflow-y: auto;
+    }
+  </style>
+  <script src="/dist/iq-cert.js"></script>
+</head>
+<body>
+  <div class="wrap">
+    <h1>智力测验 2026 旗舰版（模拟宿主）</h1>
+    <p>模拟完成 119 题测试或从“过往成绩”回溯成绩的情形（测试数据取自用户来信截图：141 分）。</p>
+
+    <div class="score-box">
+      <div class="score-val">141</div>
+      <div class="score-title">超常智力 · 远见者 (Top 0.5%)</div>
+      
+      <div class="dim-list">
+        <div class="dim-row"><span>模式识别 (Pattern)</span><strong>79%</strong></div>
+        <div class="dim-row"><span>视觉空间 (Spatial)</span><strong>82%</strong></div>
+        <div class="dim-row"><span>数字能力 (Numerical)</span><strong>69%</strong></div>
+        <div class="dim-row"><span>逻辑推理 (Logic)</span><strong>93%</strong></div>
+        <div class="dim-row"><span>工作记忆 (Memory)</span><strong>57%</strong></div>
+        <div class="dim-row"><span>规划能力 (Planning)</span><strong>99%</strong></div>
+        <div class="dim-row"><span>注意力 (Attention)</span><strong>99%</strong></div>
+        <div class="dim-row"><span>测试题量</span><strong>119 / 119 完整版</strong></div>
+      </div>
+    </div>
+
+    <button class="btn" id="btn-open-cert">📜 领取 / 下载官方认证证书</button>
+    <button class="btn btn-secondary" id="btn-clear-lock">🔄 清除本地姓名锁定 (模拟全新测试)</button>
+
+    <div class="status-log" id="status-log">> 页面已加载，ArealmeCert 引擎就绪。</div>
+  </div>
+
+  <script>
+    const logEl = document.getElementById('status-log');
+    function log(msg) {
+      logEl.innerHTML += `<div>> ${msg}</div>`;
+      logEl.scrollTop = logEl.scrollHeight;
+    }
+
+    const testAttemptId = 'ATTEMPT-2026-0920-BILL';
+
+    document.getElementById('btn-open-cert').addEventListener('click', () => {
+      log('点击触发 ArealmeCert.start()');
+      
+      if (!window.ArealmeCert) {
+        log('错误：ArealmeCert 未加载');
+        return;
+      }
+
+      window.ArealmeCert.start({
+        score: 141,
+        date: '2026.09.20',
+        attemptId: testAttemptId,
+        dimensions: [79, 82, 69, 93, 57, 99, 99], // Pattern, Spatial, Numerical, Logic, Memory, Planning, Attention
+        lang: 'cn',
+        verifyBaseUrl: '/cert/iq/v'
+      });
+    });
+
+    document.getElementById('btn-clear-lock').addEventListener('click', () => {
+      localStorage.removeItem('arealme:iq:cert:name:' + testAttemptId);
+      log('已清除当前 Attempt 的姓名锁定，再次点击可重新输入姓名测试。');
+    });
+  </script>
+</body>
+</html>

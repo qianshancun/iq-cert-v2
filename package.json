@@ -1,0 +1,32 @@
+{
+  "name": "iq-cert-v2",
+  "version": "2.0.0",
+  "description": "Next-generation ARealMe IQ Certificate Engine, Verification Portal, and Cloudflare Worker",
+  "main": "dist/iq-cert.js",
+  "type": "module",
+  "scripts": {
+    "build:engine": "node scripts/build-engine.mjs",
+    "build:verify": "node scripts/build-verify.mjs",
+    "build:worker": "node scripts/build-worker.mjs",
+    "build": "npm run build:engine && npm run build:verify && npm run build:worker",
+    "dev:engine": "node scripts/build-engine.mjs --watch",
+    "dev:verify": "node scripts/build-verify.mjs --watch",
+    "preview": "node scripts/preview-server.mjs",
+    "deploy:worker": "npm run build && wrangler deploy"
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.0",
+    "typescript": "^5.7.3",
+    "wrangler": "^4.24.1"
+  },
+  "keywords": [
+    "arealme",
+    "iq",
+    "certificate",
+    "verification",
+    "cloudflare-worker",
+    "canvas",
+    "sharekit"
+  ],
+  "license": "MIT"
+}

@@ -1,0 +1,33 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "iq-cert-v2",
+  "compatibility_date": "2026-08-24",
+  "compatibility_flags": ["nodejs_compat"],
+  "main": "dist/worker/index.js",
+  "assets": {
+    "directory": "./dist/verify",
+    "binding": "ASSETS",
+    "html_handling": "auto-trailing-slash",
+    "not_found_handling": "single-page-application",
+    "run_worker_first": ["/cert/iq/v*", "/cert/iq/api/*", "/cert/iq-cert.js"]
+  },
+  "routes": [
+    {
+      "pattern": "www.arealme.com/cert/iq",
+      "zone_name": "arealme.com"
+    },
+    {
+      "pattern": "www.arealme.com/cert/iq/*",
+      "zone_name": "arealme.com"
+    }
+  ],
+  "vars": {
+    "ENV": "production",
+    "APP_BASE_URL": "https://www.arealme.com/cert/iq",
+    "IQ_TEST_URL_EN": "https://www.arealme.com/iq/",
+    "IQ_TEST_URL_CN": "https://www.arealme.com/iq/cn/"
+  },
+  "observability": {
+    "enabled": true
+  }
+}
