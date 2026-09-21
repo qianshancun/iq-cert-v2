@@ -255,9 +255,7 @@ export function drawRadarChart(
     const ly = centerY + Math.sin(angle) * labelDist;
 
     const dimKey = dimensions[i].key;
-    const labelText = isZh
-      ? DIMENSION_LABELS.cn[dimKey]?.name || dimKey
-      : DIMENSION_LABELS.en[dimKey]?.name || dimKey;
+    const labelText = DIMENSION_LABELS.en[dimKey]?.name || dimKey;
 
     let align: CanvasTextAlign = 'center';
     if (Math.cos(angle) > 0.3) align = 'left';

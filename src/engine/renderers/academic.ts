@@ -8,7 +8,6 @@ export function renderAcademic(
   payload: IQCertificatePayload,
   verifyUrl: string
 ): void {
-  const isZh = payload.l === 'cn' || payload.l === 'zh-CN';
   const archetype = getArchetype(payload.s);
   const dimensions = normalizeDimensions(payload.m);
 
@@ -45,10 +44,10 @@ export function renderAcademic(
   // 3. Header
   drawText(
     ctx,
-    isZh ? 'AREALME 官方认知能力认证委员会' : 'AREALME COGNITIVE ASSESSMENT COMMITTEE',
+    'AREALME COGNITIVE ASSESSMENT COMMITTEE',
     600,
     68,
-    '700 15px "Cinzel", "Times New Roman", "PingFang SC", serif',
+    '700 15px "Cinzel", "Times New Roman", serif',
     '#748A9D',
     'center',
     800
@@ -56,10 +55,10 @@ export function renderAcademic(
 
   drawText(
     ctx,
-    isZh ? '智力测验学术认证证书' : 'CERTIFICATE OF INTELLECTUAL EXCELLENCE',
+    'CERTIFICATE OF INTELLECTUAL EXCELLENCE',
     600,
     100,
-    '700 28px "Cinzel", "Times New Roman", "PingFang SC", serif',
+    '700 28px "Cinzel", "Times New Roman", serif',
     '#1D2D44',
     'center',
     900
@@ -76,10 +75,10 @@ export function renderAcademic(
   // 4. Candidate Info
   drawText(
     ctx,
-    isZh ? '特此证明考生' : 'THIS OFFICIAL DOCUMENT ACCREDITS THAT',
+    'THIS OFFICIAL DOCUMENT ACCREDITS THAT',
     600,
     148,
-    'italic 14px "Libre Baskerville", "Georgia", "PingFang SC", serif',
+    'italic 14px "Libre Baskerville", "Georgia", serif',
     '#666666'
   );
 
@@ -96,13 +95,13 @@ export function renderAcademic(
   );
 
   // Conferred Title
-  const title = isZh ? archetype.titleCn : archetype.titleEn.toUpperCase();
+  const title = archetype.titleEn.toUpperCase();
   drawText(
     ctx,
-    isZh ? `经综合测试表现卓越，特授予荣誉认证：【${title}】` : `HAS COMPLETED THE DEFINITIVE STANDARDIZED TEST WITH DISTINCTION: ${title}`,
+    `HAS COMPLETED THE DEFINITIVE STANDARDIZED TEST WITH DISTINCTION: ${title}`,
     600,
     224,
-    '600 15px "Inter", "PingFang SC", sans-serif',
+    '600 15px "Inter", sans-serif',
     '#C5A059',
     'center',
     960
@@ -118,10 +117,10 @@ export function renderAcademic(
 
   drawText(
     ctx,
-    isZh ? '标准智商测试得分' : 'STANDARDIZED IQ SCORE',
+    'STANDARDIZED IQ SCORE',
     290,
     294,
-    '700 14px "Inter", "PingFang SC", sans-serif',
+    '700 14px "Inter", sans-serif',
     '#748A9D'
   );
 
@@ -136,16 +135,16 @@ export function renderAcademic(
 
   drawText(
     ctx,
-    isZh ? `超越全球 ${archetype.percentile.replace('Top ', '前 ')} 受测群体` : `Ranks in the ${archetype.percentile} of Global Population`,
+    `Ranks in the ${archetype.percentile} of Global Population`,
     290,
     444,
-    '700 15px "Inter", "PingFang SC", sans-serif',
+    '700 15px "Inter", sans-serif',
     '#C5A059'
   );
 
   drawText(
     ctx,
-    isZh ? `核验编号: ARM-${payload.id || '2026'} · 发证日期: ${payload.d}` : `VERIFICATION REF: ARM-${payload.id || '2026'} · DATE: ${payload.d}`,
+    `VERIFICATION REF: ARM-${payload.id || '2026'} · DATE: ${payload.d}`,
     290,
     490,
     '500 12px "Inter", monospace',
@@ -157,19 +156,17 @@ export function renderAcademic(
   const startY = 270;
   drawText(
     ctx,
-    isZh ? '认知能力 7 维剖析指标' : '7-DIMENSION COGNITIVE PROFILE',
+    '7-DIMENSION COGNITIVE PROFILE',
     startX,
     startY,
-    '700 15px "Cinzel", "Inter", "PingFang SC", sans-serif',
+    '700 15px "Cinzel", "Inter", sans-serif',
     '#1D2D44',
     'left'
   );
 
   dimensions.forEach((dim, idx) => {
     const rowY = startY + 32 + idx * 31;
-    const dimName = isZh
-      ? DIMENSION_LABELS.cn[dim.key]?.name || dim.key
-      : DIMENSION_LABELS.en[dim.key]?.name || dim.key;
+    const dimName = DIMENSION_LABELS.en[dim.key]?.name || dim.key;
 
     // Dimension Name
     drawText(
@@ -177,7 +174,7 @@ export function renderAcademic(
       dimName,
       startX,
       rowY,
-      '600 13px "Inter", "PingFang SC", sans-serif',
+      '600 13px "Inter", sans-serif',
       '#444444',
       'left',
       120
@@ -212,10 +209,10 @@ export function renderAcademic(
 
   drawText(
     ctx,
-    isZh ? '扫码核验官方真伪' : 'SCAN TO VERIFY',
+    'SCAN TO VERIFY',
     qrX + qrSize / 2,
     qrY + qrSize + 18,
-    '700 11px "Inter", "PingFang SC", sans-serif',
+    '700 11px "Inter", sans-serif',
     '#C5A059',
     'center'
   );
@@ -248,12 +245,10 @@ export function renderAcademic(
   // Bottom Footnote
   drawText(
     ctx,
-    isZh
-      ? 'AREALME 智商测验学术报告由大数据常模校准 · 永久存证唯一记录'
-      : 'Calibrated against millions of global test-taker distributions · Permanent digital certification',
+    'Calibrated against millions of global test-taker distributions · Permanent digital certification',
     600,
     574,
-    '12px "Inter", "PingFang SC", sans-serif',
+    '12px "Inter", sans-serif',
     '#999999',
     'center'
   );

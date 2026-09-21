@@ -7,7 +7,6 @@ export function renderRoyal(
   payload: IQCertificatePayload,
   verifyUrl: string
 ): void {
-  const isZh = payload.l === 'cn' || payload.l === 'zh-CN';
   const archetype = getArchetype(payload.s);
   const dimensions = normalizeDimensions(payload.m);
 
@@ -59,7 +58,7 @@ export function renderRoyal(
   // 4. Header Titles
   drawText(
     ctx,
-    isZh ? 'AREALME 皇家智力典册 · 官方权威认证' : 'AREALME HIGH INTELLECT COUNCIL · IMPERIAL CHARTER',
+    'AREALME HIGH INTELLECT COUNCIL · IMPERIAL CHARTER',
     600,
     58,
     '700 13px "Cinzel", "Times New Roman", serif',
@@ -70,10 +69,10 @@ export function renderRoyal(
 
   drawText(
     ctx,
-    isZh ? '至尊智力与认知天赋荣誉状' : 'CONFERMENT OF SUPREME INTELLECTUAL DIGNITY',
+    'CONFERMENT OF SUPREME INTELLECTUAL DIGNITY',
     600,
     88,
-    '700 24px "Cinzel", "Times New Roman", "PingFang SC", serif',
+    '700 24px "Cinzel", "Times New Roman", serif',
     '#F5E6BE',
     'center',
     960
@@ -92,10 +91,10 @@ export function renderRoyal(
 
   drawText(
     ctx,
-    isZh ? '受勋候选人 / CANDIDATE' : 'ACCREDITED CANDIDATE',
+    'ACCREDITED CANDIDATE',
     leftX,
     145,
-    '600 12px "Inter", "PingFang SC", sans-serif',
+    '600 12px "Inter", sans-serif',
     '#A1824A',
     'left'
   );
@@ -118,13 +117,13 @@ export function renderRoyal(
   );
 
   // Conferred Title
-  const title = isZh ? archetype.titleCn : archetype.titleEn.toUpperCase();
+  const title = archetype.titleEn.toUpperCase();
   drawText(
     ctx,
-    isZh ? `经全景认知测评，特授予皇家尊号：【${title}】` : `CONFERRED TITLE OF ROYAL DISTINCTION: ${title}`,
+    `CONFERRED TITLE OF ROYAL DISTINCTION: ${title}`,
     leftX,
     228,
-    '700 14px "Inter", "PingFang SC", sans-serif',
+    '700 14px "Inter", sans-serif',
     '#E6CA85',
     'left',
     460
@@ -139,10 +138,10 @@ export function renderRoyal(
 
   drawText(
     ctx,
-    isZh ? '标准智商测试最终核定得分' : 'OFFICIAL STANDARDIZED IQ RATING',
+    'OFFICIAL STANDARDIZED IQ RATING',
     leftX + 215,
     292,
-    '700 13px "Inter", "PingFang SC", sans-serif',
+    '700 13px "Inter", sans-serif',
     '#A1824A',
     'center'
   );
@@ -169,10 +168,10 @@ export function renderRoyal(
 
   drawText(
     ctx,
-    isZh ? `超越全球 ${archetype.percentile.replace('Top ', '前 ')} 受测群体` : `TIER: ${archetype.percentile.toUpperCase()} WORLDWIDE`,
+    `TIER: ${archetype.percentile.toUpperCase()} WORLDWIDE`,
     leftX + 215,
     428,
-    '800 14px "Inter", "PingFang SC", sans-serif',
+    '800 14px "Inter", sans-serif',
     '#FACC15',
     'center'
   );
@@ -192,7 +191,7 @@ export function renderRoyal(
   const radarCenterY = 370;
   const radarRadius = 125;
 
-  drawRadarChart(ctx, radarCenterX, radarCenterY, radarRadius, dimensions, payload.l, {
+  drawRadarChart(ctx, radarCenterX, radarCenterY, radarRadius, dimensions, 'en', {
     gridColor: 'rgba(212, 175, 55, 0.25)',
     axisColor: 'rgba(212, 175, 55, 0.35)',
     fillColor: 'rgba(234, 179, 8, 0.22)',
@@ -203,10 +202,10 @@ export function renderRoyal(
 
   drawText(
     ctx,
-    isZh ? '7 维认知天赋星盘 (COGNITIVE ASTROLABE)' : '7-DIMENSIONAL COGNITIVE ASTROLABE',
+    '7-DIMENSIONAL COGNITIVE ASTROLABE',
     radarCenterX,
     188,
-    '700 13px "Cinzel", "Inter", "PingFang SC", sans-serif',
+    '700 13px "Cinzel", "Inter", sans-serif',
     '#C5A059',
     'center'
   );
@@ -225,10 +224,10 @@ export function renderRoyal(
 
   drawText(
     ctx,
-    isZh ? '扫码验证真伪' : 'SCAN TO VERIFY',
+    'SCAN TO VERIFY',
     qrX + qrSize / 2,
     qrY + qrSize + 16,
-    '700 11px "Inter", "PingFang SC", sans-serif',
+    '700 11px "Inter", sans-serif',
     '#E6CA85',
     'center'
   );
@@ -246,12 +245,10 @@ export function renderRoyal(
   // Bottom seal / footnote
   drawText(
     ctx,
-    isZh
-      ? '此证代表全球顶尖认知心智水准 · 官方数字化加密防伪存档'
-      : 'Accredited by ARealMe Psychometrics Division · Cryptographically Secured',
+    'Accredited by ARealMe Psychometrics Division · Cryptographically Secured',
     600,
     585,
-    '11px "Inter", "PingFang SC", sans-serif',
+    '11px "Inter", sans-serif',
     '#856A28',
     'center'
   );

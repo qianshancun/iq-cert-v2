@@ -98,19 +98,19 @@ export default {
     if (token && isBot(request.headers.get('User-Agent'))) {
       const { payload } = await decodeCertificateToken(token);
       if (payload) {
-        const isZh = payload.l === 'cn' || payload.l === 'zh-CN';
         const archetype = getArchetype(payload.s);
-        const title = isZh ? archetype.titleCn : archetype.titleEn;
-        const pageTitle = isZh
-          ? `${payload.n} 的 AREALME 智商官方认证：${payload.s} 分`
-          : `${payload.n}'s Official AREALME IQ Certificate: ${payload.s}`;
-        const pageDesc = isZh
-          ? `官方核定智商 ${payload.s} 分（${title} · ${archetype.percentile.replace('Top ', '全球前 ')}）。查看 7 维高阶认知报告与真伪存证。`
-          : `Verified IQ Score of ${payload.s} (${title} · ${archetype.percentile} Worldwide). Inspect the 7-dimension cognitive breakdown and official credentials.`;
+        const title = archetype.titleEn;
+        const pageTitle = `${payload.n}'s Official AREALME IQ Certificate: ${payload.s}`;
+        const pageDesc = `Verified IQ Score of ${payload.s} (${title} · ${archetype.percentile} Worldwide). Inspect the 7-dimension cognitive breakdown and official credentials.`;
+
+        const cleanLang = (payload.l || 'en').trim().toLowerCase();
+        const testUrl = !cleanLang || cleanLang === 'en'
+          ? 'https://www.arealme.com/iq/'
+          : `https://www.arealme.com/iq/${cleanLang}/`;
 
         const canonical = `${url.origin}/cert/iq/v/${token}`;
         const html = `<!DOCTYPE html>
-<html lang="${isZh ? 'zh-CN' : 'en'}">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <title>${escapeHtml(pageTitle)}</title>
@@ -129,6 +129,7 @@ export default {
   <h1>${escapeHtml(pageTitle)}</h1>
   <p>${escapeHtml(pageDesc)}</p>
   <p><a href="${escapeHtml(canonical)}">View Official Certificate Document</a></p>
+  <p><a href="${escapeHtml(testUrl)}">Take the Official ARealMe IQ Test</a></p>
 </body>
 </html>`;
         return new Response(html, {

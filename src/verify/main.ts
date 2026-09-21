@@ -6,69 +6,46 @@ import { renderAcademic } from '../engine/renderers/academic';
 import { renderRoyal } from '../engine/renderers/royal';
 import { renderSwiss } from '../engine/renderers/swiss';
 
-const I18N = {
-  en: {
-    brandName: 'AREALME CERTIFIED',
-    brandDesc: 'Official Cognitive Credential & Psychometrics Registry',
-    switchLang: '中文',
-    verifiedTitle: 'Official ARealMe Certification Verified',
-    verifiedDesc: 'This credential is cryptographically authentic and registered in the ARealMe test database.',
-    tamperedTitle: 'Verification Warning: Potential Alteration',
-    tamperedDesc: 'The digital signature does not match our official records. This certificate may have been modified.',
-    scoreLabel: 'IQ RATING',
-    issuedDate: 'Issued Date:',
-    certId: 'Credential ID:',
-    dimensionsTitle: '7-Dimension Cognitive Abilities Analysis',
-    radarTitle: 'Cognitive Astrolabe Radar',
-    certPreviewTitle: 'Official Certificate Document',
-    tabAcademic: 'Academic Classical',
-    tabSwiss: 'Swiss Minimalist',
-    tabRoyal: 'Royal Astrolabe',
-    downloadCert: 'Download High-Res Certificate (PNG)',
-    shareTitle: 'Share this Verified Credential',
-    sharePrompt: 'Inspire your friends or challenge their intellect:',
-    ctaTitle: 'Think you can beat this score?',
-    ctaDesc: 'Take the definitive 2026 ARealMe IQ Test. 119 data-calibrated questions, full cognitive profile, and free official certification.',
-    ctaBtn: 'Start Free IQ Test Now →',
-    iqTestUrl: 'https://www.arealme.com/iq/',
-    footerNote: '© 2026 ARealMe.com. All psychometric data calibrated across millions of global test results.',
-  },
-  cn: {
-    brandName: 'AREALME 官方认证',
-    brandDesc: '国际认知能力证书存证与防伪核验中心',
-    switchLang: 'English',
-    verifiedTitle: 'AREALME 官方防伪认证已核验有效',
-    verifiedDesc: '该证书具备不可伪造的数字签名，并已在 AREALME 智力测验常模数据库完成永久存证。',
-    tamperedTitle: '安全警告：防伪验签未通过',
-    tamperedDesc: '该证书数据签名与系统记录不一致，可能存在人为修改或伪造，请谨慎鉴别。',
-    scoreLabel: '官方智商核定得分',
-    issuedDate: '颁证日期：',
-    certId: '存证序列号：',
-    dimensionsTitle: '7 大高阶认知能力全景剖析',
-    radarTitle: '7 维认知天赋星盘 (Radar)',
-    certPreviewTitle: '官方正式证书原件预览',
-    tabAcademic: '古典学术风',
-    tabSwiss: '现代网格风',
-    tabRoyal: '皇家星盘风',
-    downloadCert: '下载高清官方证书 (PNG)',
-    shareTitle: '分享此官方认证成绩',
-    sharePrompt: '向好友展示你的认知天赋，或发起智力挑战：',
-    ctaTitle: '想知道你的真实智商是多少吗？',
-    ctaDesc: '参与 2026 旗舰版 AREALME 智商测试：汇聚历年经典试题，大数据科学标定，全面生成 7 维认知报告与免费官方证书。',
-    ctaBtn: '立即参与智商测试 →',
-    iqTestUrl: 'https://www.arealme.com/iq/cn/',
-    footerNote: '© 2026 ARealMe.com · 历经千万人次大数据常模标定 · 严禁伪造与抄袭',
-  },
+const TEXT = {
+  brandName: 'AREALME CERTIFIED',
+  brandDesc: 'Official Cognitive Credential & Psychometrics Registry',
+  verifiedTitle: 'Official ARealMe Certification Verified',
+  verifiedDesc: 'This credential is cryptographically authentic and registered in the ARealMe test database.',
+  tamperedTitle: 'Verification Warning: Potential Alteration',
+  tamperedDesc: 'The digital signature does not match our official records. This certificate may have been modified.',
+  scoreLabel: 'IQ RATING',
+  issuedDate: 'Issued Date:',
+  certId: 'Credential ID:',
+  dimensionsTitle: '7-Dimension Cognitive Abilities Analysis',
+  radarTitle: 'Cognitive Astrolabe Radar',
+  certPreviewTitle: 'Official Certificate Document',
+  tabAcademic: 'Academic Classical',
+  tabSwiss: 'Swiss Minimalist',
+  tabRoyal: 'Royal Astrolabe',
+  downloadCert: 'Download High-Res Certificate (PNG)',
+  sharePrompt: 'Inspire your friends or challenge their intellect:',
+  ctaTitle: 'Think you can beat this score?',
+  ctaDesc: 'Take the definitive 2026 ARealMe IQ Test. 119 data-calibrated questions, full cognitive profile, and free official certification.',
+  ctaBtn: 'Start Free IQ Test Now →',
+  footerNote: '© 2026 ARealMe.com. All psychometric data calibrated across millions of global test results.',
 };
 
-// Fallback demo data if opened without URL parameters (matching Bill LTL from user screenshot!)
+function getBacktrackUrl(lang?: string): string {
+  const clean = (lang || 'en').trim().toLowerCase();
+  if (!clean || clean === 'en') {
+    return 'https://www.arealme.com/iq/';
+  }
+  return `https://www.arealme.com/iq/${clean}/`;
+}
+
+// Fallback demo data if opened without URL parameters
 const DEMO_PAYLOAD: IQCertificatePayload = {
   id: 'DEMO-BILL-2026',
   n: 'BILL LTL',
   s: 141,
   d: '2026.09.20',
   m: [79, 82, 69, 93, 57, 99, 99], // Pattern, Spatial, Numerical, Logic, Memory, Planning, Attention
-  l: 'cn',
+  l: 'en',
   sig: 'demoauth',
   v: 2,
 };
@@ -76,7 +53,6 @@ const DEMO_PAYLOAD: IQCertificatePayload = {
 class VerificationApp {
   private payload: IQCertificatePayload = DEMO_PAYLOAD;
   private isAuthentic: boolean = true;
-  private currentLang: 'en' | 'cn' = 'cn';
   private selectedDesign: IQCertDesign = 'academic';
   private certCanvas: HTMLCanvasElement | null = null;
   private certCtx: CanvasRenderingContext2D | null = null;
@@ -103,15 +79,12 @@ class VerificationApp {
       if (res.payload) {
         this.payload = res.payload;
         this.isAuthentic = res.valid;
-        this.currentLang = this.payload.l === 'en' ? 'en' : 'cn';
       } else {
         this.isAuthentic = false;
       }
     } else {
-      // Demo mode when opened without a token
       this.payload = DEMO_PAYLOAD;
       this.isAuthentic = true;
-      this.currentLang = 'cn';
     }
 
     this.render();
@@ -121,33 +94,31 @@ class VerificationApp {
     const app = document.getElementById('app');
     if (!app) return;
 
-    const t = I18N[this.currentLang];
-    const isZh = this.currentLang === 'cn';
     const archetype = getArchetype(this.payload.s);
     const dimensions = normalizeDimensions(this.payload.m);
-    const title = isZh ? archetype.titleCn : archetype.titleEn;
-    const subtitle = isZh ? archetype.subtitleCn : archetype.subtitleEn;
+    const title = archetype.titleEn;
+    const subtitle = archetype.subtitleEn;
+    const backtrackUrl = getBacktrackUrl(this.payload.l);
 
     app.innerHTML = `
       <div class="container">
         <!-- Top Nav -->
         <header class="nav-bar">
-          <a href="${t.iqTestUrl}" class="brand-wrap">
+          <a href="${backtrackUrl}" class="brand-wrap">
             <div class="brand-logo">IQ</div>
             <div class="brand-text">
-              <h1>${t.brandName}</h1>
-              <p>${t.brandDesc}</p>
+              <h1>${TEXT.brandName}</h1>
+              <p>${TEXT.brandDesc}</p>
             </div>
           </a>
-          <button class="lang-btn" id="lang-toggle-btn">${t.switchLang}</button>
         </header>
 
         <!-- Verification Banner -->
         <div class="verified-banner ${this.isAuthentic ? '' : 'unverified'}">
           <div class="shield-icon">${this.isAuthentic ? '🛡️' : '⚠️'}</div>
           <div class="verified-banner-text">
-            <h2>${this.isAuthentic ? t.verifiedTitle : t.tamperedTitle}</h2>
-            <p>${this.isAuthentic ? t.verifiedDesc : t.tamperedDesc}</p>
+            <h2>${this.isAuthentic ? TEXT.verifiedTitle : TEXT.tamperedTitle}</h2>
+            <p>${this.isAuthentic ? TEXT.verifiedDesc : TEXT.tamperedDesc}</p>
           </div>
         </div>
 
@@ -157,12 +128,12 @@ class VerificationApp {
             <div class="candidate-info">
               <h2>${this.payload.n}</h2>
               <div class="candidate-title">🎖️ ${title}</div>
-              <div class="candidate-date">${t.issuedDate} ${this.payload.d} · ${t.certId} ARM-${this.payload.id || '2026'}</div>
+              <div class="candidate-date">${TEXT.issuedDate} ${this.payload.d} · ${TEXT.certId} ARM-${this.payload.id || '2026'}</div>
             </div>
             <div class="score-badge">
               <div class="score-val">${this.payload.s}</div>
-              <div class="score-label">${t.scoreLabel}</div>
-              <div class="percentile-text">${isZh ? `位列全球 ${archetype.percentile.replace('Top ', '前 ')}` : `Rank: ${archetype.percentile}`}</div>
+              <div class="score-label">${TEXT.scoreLabel}</div>
+              <div class="percentile-text">Rank: ${archetype.percentile}</div>
             </div>
           </div>
 
@@ -170,7 +141,7 @@ class VerificationApp {
 
           <!-- 7 Dimensions Analysis -->
           <section class="dimensions-section">
-            <div class="section-title">📊 ${t.dimensionsTitle}</div>
+            <div class="section-title">📊 ${TEXT.dimensionsTitle}</div>
 
             <!-- Radar Astrolabe Canvas -->
             <div class="radar-wrap">
@@ -180,7 +151,7 @@ class VerificationApp {
             <!-- Dimensions Grid -->
             <div class="dim-grid">
               ${dimensions.map((dim) => {
-                const labelObj = isZh ? DIMENSION_LABELS.cn[dim.key] : DIMENSION_LABELS.en[dim.key];
+                const labelObj = DIMENSION_LABELS.en[dim.key];
                 return `
                   <div class="dim-item">
                     <div class="dim-header">
@@ -199,12 +170,12 @@ class VerificationApp {
 
           <!-- Certificate View & Download -->
           <section class="cert-preview-section">
-            <div class="section-title" style="justify-content: center;">📜 ${t.certPreviewTitle}</div>
+            <div class="section-title" style="justify-content: center;">📜 ${TEXT.certPreviewTitle}</div>
 
             <div class="cert-style-tabs">
-              <button class="cert-tab active" data-style="academic">${t.tabAcademic}</button>
-              <button class="cert-tab" data-style="swiss">${t.tabSwiss}</button>
-              <button class="cert-tab" data-style="royal">${t.tabRoyal}</button>
+              <button class="cert-tab active" data-style="academic">${TEXT.tabAcademic}</button>
+              <button class="cert-tab" data-style="swiss">${TEXT.tabSwiss}</button>
+              <button class="cert-tab" data-style="royal">${TEXT.tabRoyal}</button>
             </div>
 
             <div class="cert-canvas-box">
@@ -212,13 +183,13 @@ class VerificationApp {
             </div>
 
             <button class="btn-download-cert" id="btn-download-png">
-              <span>⬇️</span> ${t.downloadCert}
+              <span>⬇️</span> ${TEXT.downloadCert}
             </button>
           </section>
 
           <!-- ShareKit Component -->
           <section class="share-section">
-            <p>🌐 ${t.sharePrompt}</p>
+            <p>🌐 ${TEXT.sharePrompt}</p>
             <social-share
               id="social-share-btn"
               style="display: block; min-height: 48px;"
@@ -226,40 +197,34 @@ class VerificationApp {
               radius="8px"
               gap="12"
               url="${window.location.href}"
-              title="${isZh ? `我在 AREALME 智商测试中获得了 ${this.payload.s} 分（${archetype.percentile.replace('Top ', '全球前 ')}）！这是我的官方认证 7 维认知能力报告：` : `I scored ${this.payload.s} on the Official AREALME IQ Test (${archetype.percentile})! Check my verified cognitive report:`}"
+              title="I scored ${this.payload.s} on the Official AREALME IQ Test (${archetype.percentile})! Check my verified cognitive report:"
             ></social-share>
           </section>
         </main>
 
         <!-- Viral CTA: Challenge IQ Test -->
         <aside class="cta-banner">
-          <h2>${t.ctaTitle}</h2>
-          <p>${t.ctaDesc}</p>
-          <a href="${t.iqTestUrl}" class="cta-btn" target="_blank" rel="noopener noreferrer">
-            ${t.ctaBtn}
+          <h2>${TEXT.ctaTitle}</h2>
+          <p>${TEXT.ctaDesc}</p>
+          <a href="${backtrackUrl}" class="cta-btn" target="_blank" rel="noopener noreferrer">
+            ${TEXT.ctaBtn}
           </a>
         </aside>
 
         <!-- Footer -->
         <footer class="portal-footer">
-          <p>${t.footerNote}</p>
+          <p>${TEXT.footerNote}</p>
         </footer>
       </div>
     `;
 
     this.bindEvents();
     this.drawRadar();
-    this.drawCertificate();
+    this.initCertCanvas();
   }
 
   private bindEvents(): void {
-    // Language Toggle
-    document.getElementById('lang-toggle-btn')?.addEventListener('click', () => {
-      this.currentLang = this.currentLang === 'cn' ? 'en' : 'cn';
-      this.render();
-    });
-
-    // Style Tabs
+    // Certificate Tabs
     document.querySelectorAll<HTMLButtonElement>('.cert-tab').forEach((tab) => {
       tab.addEventListener('click', () => {
         document.querySelectorAll('.cert-tab').forEach((t) => t.classList.remove('active'));
@@ -269,11 +234,11 @@ class VerificationApp {
       });
     });
 
-    // Download Button
+    // Download Certificate
     document.getElementById('btn-download-png')?.addEventListener('click', () => {
       if (!this.certCanvas) return;
       const a = document.createElement('a');
-      a.download = `AREALME-IQ-${this.payload.s}-${this.payload.n.replace(/\s+/g, '_')}.png`;
+      a.download = `AREALME-IQ-Certified-${this.payload.s}-${this.payload.n.replace(/\s+/g, '_')}.png`;
       a.href = this.certCanvas.toDataURL('image/png');
       a.click();
     });
@@ -288,34 +253,42 @@ class VerificationApp {
     ctx.clearRect(0, 0, 400, 400);
     const dimensions = normalizeDimensions(this.payload.m);
 
-    drawRadarChart(ctx, 200, 200, 130, dimensions, this.currentLang, {
-      gridColor: 'rgba(255, 255, 255, 0.12)',
-      axisColor: 'rgba(255, 255, 255, 0.18)',
+    drawRadarChart(ctx, 200, 200, 130, dimensions, 'en', {
+      gridColor: 'rgba(55, 65, 81, 0.4)',
+      axisColor: 'rgba(75, 85, 99, 0.5)',
       fillColor: 'rgba(16, 185, 129, 0.25)',
       strokeColor: '#10B981',
-      labelColor: '#D1D5DB',
-      valueColor: '#FFFFFF',
+      labelColor: '#9CA3AF',
+      valueColor: '#10B981',
     });
   }
 
-  private drawCertificate(): void {
+  private initCertCanvas(): void {
     this.certCanvas = document.getElementById('view-cert-canvas') as HTMLCanvasElement;
-    if (!this.certCanvas) return;
-    this.certCtx = this.certCanvas.getContext('2d');
+    if (this.certCanvas) {
+      this.certCtx = this.certCanvas.getContext('2d');
+      this.drawCertificate();
+    }
+  }
+
+  private drawCertificate(): void {
     if (!this.certCtx) return;
-
     this.certCtx.clearRect(0, 0, 1200, 630);
-    const verifyUrl = window.location.href;
 
+    const currentUrl = window.location.href;
     if (this.selectedDesign === 'swiss') {
-      renderSwiss(this.certCtx, this.payload, verifyUrl);
+      renderSwiss(this.certCtx, this.payload, currentUrl);
     } else if (this.selectedDesign === 'royal') {
-      renderRoyal(this.certCtx, this.payload, verifyUrl);
+      renderRoyal(this.certCtx, this.payload, currentUrl);
     } else {
-      renderAcademic(this.certCtx, this.payload, verifyUrl);
+      renderAcademic(this.certCtx, this.payload, currentUrl);
     }
   }
 }
 
-// Start application
-new VerificationApp();
+// Start App on DOM Ready
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => new VerificationApp());
+} else {
+  new VerificationApp();
+}

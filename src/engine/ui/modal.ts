@@ -1,4 +1,5 @@
-import { BLACKLIST, DEFAULT_VERIFY_BASE_URL, buildVerifyUrl } from '../../shared/constants';
+import { BLACKLIST, DEFAULT_VERIFY_BASE_URL } from '../../shared/constants';
+import { buildVerifyUrl } from '../../shared/constants';
 import { encodeCertificateToken } from '../../shared/token';
 import type { IQCertDesign, IQCertificatePayload, IQCertificateStartData } from '../../shared/types';
 import { renderAcademic } from '../renderers/academic';
@@ -7,43 +8,21 @@ import { renderSwiss } from '../renderers/swiss';
 
 const MODAL_ID = 'arealme-cert-modal-v2';
 
-const I18N = {
-  en: {
-    modalTitle: 'Official AREALME IQ Certificate',
-    enterName: 'Enter your name or initials',
-    namePlaceholder: 'e.g., Alex Morgan or J.D.',
-    generateBtn: 'Generate Certificate',
-    lockedNotice: 'Identity is permanently bound to this test attempt to ensure scarcity.',
-    lockedNameLabel: 'Certificate issued to:',
-    btnViewIssued: 'View Certificate',
-    tabAcademic: 'Academic',
-    tabSwiss: 'Swiss Minimal',
-    tabRoyal: 'Royal Astrolabe',
-    btnDownload: 'Download PNG',
-    btnVerifyOnline: 'Verify Online / Share',
-    btnClose: 'Close',
-    invalidInput: 'Please enter a valid name (letters, numbers, or Chinese characters).',
-    blacklisted: 'Please enter a suitable and respectful name.',
-    copied: 'Link copied to clipboard!',
-  },
-  cn: {
-    modalTitle: 'AREALME 官方智商认证证书',
-    enterName: '请输入证书受勋人姓名或缩写',
-    namePlaceholder: '例如：李明、Alex、J.D.',
-    generateBtn: '生成官方证书',
-    lockedNotice: '为保障官方认证的真实性与稀缺性，本次成绩将终身绑定该姓名。',
-    lockedNameLabel: '已发证考生：',
-    btnViewIssued: '查看认证证书',
-    tabAcademic: '古典学术风',
-    tabSwiss: '现代网格风',
-    tabRoyal: '皇家星盘风',
-    btnDownload: '下载高清证书 (PNG)',
-    btnVerifyOnline: '官方查验与在线分享',
-    btnClose: '关闭',
-    invalidInput: '请输入有效的姓名（支持汉字、英文字母或缩写）。',
-    blacklisted: '该名称包含不适宜词汇，请更换后重试。',
-    copied: '在线核验链接已复制到剪贴板！',
-  },
+const TEXT = {
+  modalTitle: 'Official AREALME IQ Certificate',
+  enterName: 'Enter your name or initials',
+  namePlaceholder: 'e.g., Alex Morgan or J.D.',
+  generateBtn: 'Generate Certificate',
+  lockedNotice: 'Identity is permanently bound to this test attempt to ensure authenticity and scarcity.',
+  lockedNameLabel: 'Certificate issued to:',
+  tabAcademic: 'Academic',
+  tabSwiss: 'Swiss Minimal',
+  tabRoyal: 'Royal Astrolabe',
+  btnDownload: 'Download PNG',
+  btnVerifyOnline: 'Verify Online / Share',
+  btnClose: 'Close',
+  invalidInput: 'Please enter a valid name (letters, numbers, or characters).',
+  blacklisted: 'Please enter a suitable and respectful name.',
 };
 
 export class CertificateModal {
@@ -54,11 +33,9 @@ export class CertificateModal {
   private data: IQCertificateStartData;
   private payload: IQCertificatePayload | null = null;
   private verifyUrl: string = '';
-  private lang: 'en' | 'cn';
 
   constructor(data: IQCertificateStartData) {
     this.data = data;
-    this.lang = (data.lang === 'cn' || data.lang === 'zh-CN') ? 'cn' : 'en';
   }
 
   public async open(): Promise<void> {
@@ -102,7 +79,7 @@ export class CertificateModal {
         background: rgba(10, 12, 16, 0.86);
         backdrop-filter: blur(10px);
         -webkit-backdrop-filter: blur(10px);
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", sans-serif;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         color: #F3F4F6;
         box-sizing: border-box;
         padding: 16px;
@@ -333,6 +310,7 @@ export class CertificateModal {
 
     const today = this.data.date || new Date().toISOString().slice(0, 10).replace(/-/g, '.');
     const attemptId = this.data.attemptId || Math.random().toString(36).substring(2, 10);
+    const recordedLang = (this.data.lang || 'en').trim();
 
     const basePayload: Omit<IQCertificatePayload, 'sig'> = {
       id: attemptId,
@@ -340,7 +318,7 @@ export class CertificateModal {
       s: this.data.score,
       d: today,
       m: norm,
-      l: this.lang,
+      l: recordedLang,
       v: 2,
     };
 
@@ -362,24 +340,23 @@ export class CertificateModal {
   }
 
   private renderInputView(): void {
-    const t = I18N[this.lang];
     const overlay = document.createElement('div');
     overlay.id = MODAL_ID;
 
     overlay.innerHTML = `
       <div class="arm-cert-dialog" role="dialog" aria-modal="true">
         <div class="arm-cert-header">
-          <h3>🎖️ ${t.modalTitle}</h3>
+          <h3>🎖️ ${TEXT.modalTitle}</h3>
           <button class="arm-cert-close-btn" id="arm-cert-close-btn" aria-label="Close">×</button>
         </div>
         <div class="arm-cert-body">
           <div class="arm-cert-input-wrap">
             <div class="arm-cert-input-icon">📜</div>
-            <div class="arm-cert-input-title">${t.enterName}</div>
-            <div class="arm-cert-input-desc">${t.lockedNotice}</div>
-            <input type="text" class="arm-cert-input-field" id="arm-cert-name-input" maxlength="20" placeholder="${t.namePlaceholder}" autofocus>
+            <div class="arm-cert-input-title">${TEXT.enterName}</div>
+            <div class="arm-cert-input-desc">${TEXT.lockedNotice}</div>
+            <input type="text" class="arm-cert-input-field" id="arm-cert-name-input" maxlength="24" placeholder="${TEXT.namePlaceholder}" autofocus>
             <div id="arm-cert-error" style="color:#EF4444; font-size:12px; margin-top:8px; display:none;"></div>
-            <button class="arm-cert-btn-primary" id="arm-cert-submit-btn">${t.generateBtn}</button>
+            <button class="arm-cert-btn-primary" id="arm-cert-submit-btn">${TEXT.generateBtn}</button>
           </div>
         </div>
       </div>
@@ -388,10 +365,8 @@ export class CertificateModal {
     document.body.appendChild(overlay);
     this.container = overlay;
 
-    // Fade in
     requestAnimationFrame(() => overlay.classList.add('active'));
 
-    // Bindings
     const input = overlay.querySelector<HTMLInputElement>('#arm-cert-name-input')!;
     const btnSubmit = overlay.querySelector<HTMLButtonElement>('#arm-cert-submit-btn')!;
     const btnClose = overlay.querySelector<HTMLButtonElement>('#arm-cert-close-btn')!;
@@ -401,7 +376,7 @@ export class CertificateModal {
       const val = input.value.trim();
       if (!val || val.length < 1) {
         input.classList.add('error');
-        errorMsg.textContent = t.invalidInput;
+        errorMsg.textContent = TEXT.invalidInput;
         errorMsg.style.display = 'block';
         return;
       }
@@ -410,7 +385,7 @@ export class CertificateModal {
       const upper = val.toUpperCase().replace(/[^A-Z]/g, '');
       if (BLACKLIST.some((b) => upper.includes(b))) {
         input.classList.add('error');
-        errorMsg.textContent = t.blacklisted;
+        errorMsg.textContent = TEXT.blacklisted;
         errorMsg.style.display = 'block';
         return;
       }
@@ -434,7 +409,6 @@ export class CertificateModal {
 
   private renderPreviewView(): void {
     if (!this.payload) return;
-    const t = I18N[this.lang];
 
     let overlay = document.getElementById(MODAL_ID);
     if (!overlay) {
@@ -447,28 +421,28 @@ export class CertificateModal {
     overlay.innerHTML = `
       <div class="arm-cert-dialog" role="dialog" aria-modal="true">
         <div class="arm-cert-header">
-          <h3>🎖️ ${t.modalTitle} · ${this.payload.n} (${this.payload.s})</h3>
+          <h3>🎖️ ${TEXT.modalTitle} · ${this.payload.n} (${this.payload.s})</h3>
           <button class="arm-cert-close-btn" id="arm-cert-close-btn" aria-label="Close">×</button>
         </div>
         <div class="arm-cert-body">
           <div class="arm-cert-preview-wrap">
             <div class="arm-cert-tabs">
-              <button class="arm-cert-tab active" data-design="academic">${t.tabAcademic}</button>
-              <button class="arm-cert-tab" data-design="swiss">${t.tabSwiss}</button>
-              <button class="arm-cert-tab" data-design="royal">${t.tabRoyal}</button>
+              <button class="arm-cert-tab active" data-design="academic">${TEXT.tabAcademic}</button>
+              <button class="arm-cert-tab" data-design="swiss">${TEXT.tabSwiss}</button>
+              <button class="arm-cert-tab" data-design="royal">${TEXT.tabRoyal}</button>
             </div>
-            <div class="arm-cert-canvas-container">
+            <div class="arm-cert-canvas-container" id="ac-wrapper">
               <canvas id="arm-cert-canvas" width="1200" height="630"></canvas>
             </div>
             <div class="arm-cert-actions">
               <button class="arm-cert-btn arm-cert-btn-download" id="arm-cert-download-btn">
-                <span>⬇️</span> ${t.btnDownload}
+                <span>⬇️</span> ${TEXT.btnDownload}
               </button>
               <button class="arm-cert-btn arm-cert-btn-online" id="arm-cert-online-btn">
-                <span>🔗</span> ${t.btnVerifyOnline}
+                <span>🔗</span> ${TEXT.btnVerifyOnline}
               </button>
               <button class="arm-cert-btn arm-cert-btn-cancel" id="arm-cert-cancel-btn">
-                ${t.btnClose}
+                ${TEXT.btnClose}
               </button>
             </div>
           </div>
@@ -517,6 +491,17 @@ export class CertificateModal {
     } else {
       renderAcademic(this.ctx, this.payload, this.verifyUrl);
     }
+
+    // Dispatch event for host page capture
+    window.dispatchEvent(
+      new CustomEvent('arealme:cert:rendered', {
+        detail: {
+          canvas: this.canvas,
+          payload: this.payload,
+          design: this.currentDesign,
+        },
+      })
+    );
   }
 
   private downloadPng(): void {

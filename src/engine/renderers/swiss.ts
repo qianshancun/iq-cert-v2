@@ -8,7 +8,6 @@ export function renderSwiss(
   payload: IQCertificatePayload,
   verifyUrl: string
 ): void {
-  const isZh = payload.l === 'cn' || payload.l === 'zh-CN';
   const archetype = getArchetype(payload.s);
   const dimensions = normalizeDimensions(payload.m);
 
@@ -42,10 +41,10 @@ export function renderSwiss(
 
   drawText(
     ctx,
-    isZh ? '全球权威标准化智商认证' : 'STANDARDIZED IQ CERTIFICATION',
+    'STANDARDIZED IQ CERTIFICATION',
     50,
     88,
-    '600 12px "Inter", "PingFang SC", sans-serif',
+    '600 12px "Inter", sans-serif',
     '#9CA3AF',
     'left'
   );
@@ -70,10 +69,10 @@ export function renderSwiss(
 
   drawText(
     ctx,
-    isZh ? `超越全球 ${archetype.percentile.replace('Top ', '前 ')} 受测群体` : `TIER: ${archetype.percentile.toUpperCase()} WORLDWIDE`,
+    `TIER: ${archetype.percentile.toUpperCase()} WORLDWIDE`,
     200,
     394,
-    '800 13px "Inter", "PingFang SC", sans-serif',
+    '800 13px "Inter", sans-serif',
     '#10B981',
     'center'
   );
@@ -81,10 +80,10 @@ export function renderSwiss(
   // Subtitle / Archetype
   drawText(
     ctx,
-    isZh ? archetype.titleCn : archetype.titleEn.toUpperCase(),
+    archetype.titleEn.toUpperCase(),
     50,
     445,
-    '800 18px "Inter", "PingFang SC", sans-serif',
+    '800 18px "Inter", sans-serif',
     '#E5E7EB',
     'left',
     320
@@ -118,10 +117,10 @@ export function renderSwiss(
   // Header Title & Bearer
   drawText(
     ctx,
-    isZh ? '认证考生姓名 / ACCREDITED CANDIDATE' : 'ACCREDITED CANDIDATE',
+    'ACCREDITED CANDIDATE',
     470,
     56,
-    '700 12px "Inter", "PingFang SC", sans-serif',
+    '700 12px "Inter", sans-serif',
     '#6B7280',
     'left'
   );
@@ -143,10 +142,10 @@ export function renderSwiss(
 
   drawText(
     ctx,
-    isZh ? '7 项高阶认知能力数据矩阵 (COGNITIVE MATRIX)' : '7-DIMENSIONAL COGNITIVE PROFILE MATRIX',
+    '7-DIMENSIONAL COGNITIVE PROFILE MATRIX',
     470,
     165,
-    '800 14px "Inter", "PingFang SC", sans-serif',
+    '800 14px "Inter", sans-serif',
     '#111827',
     'left'
   );
@@ -158,9 +157,7 @@ export function renderSwiss(
 
   dimensions.forEach((dim, idx) => {
     const rowY = listStartY + idx * 36;
-    const dimName = isZh
-      ? DIMENSION_LABELS.cn[dim.key]?.name || dim.key
-      : DIMENSION_LABELS.en[dim.key]?.name || dim.key;
+    const dimName = DIMENSION_LABELS.en[dim.key]?.name || dim.key;
 
     // Dimension Label
     drawText(
@@ -168,7 +165,7 @@ export function renderSwiss(
       dimName,
       listStartX,
       rowY,
-      '700 13px "Inter", "PingFang SC", sans-serif',
+      '700 13px "Inter", sans-serif',
       '#374151',
       'left',
       110
@@ -203,10 +200,10 @@ export function renderSwiss(
 
   drawText(
     ctx,
-    isZh ? '扫码查验官方存证' : 'SCAN TO VERIFY',
+    'SCAN TO VERIFY',
     qrX + qrSize / 2,
     qrY + qrSize + 20,
-    '800 11px "Inter", "PingFang SC", sans-serif',
+    '800 11px "Inter", sans-serif',
     '#111827',
     'center'
   );
@@ -224,12 +221,10 @@ export function renderSwiss(
   // Swiss style bottom tagline
   drawText(
     ctx,
-    isZh
-      ? '该证书经由 AREALME 智力测验引擎独立计算并永久保真 · 严禁伪造篡改'
-      : 'Cryptographically bound to test session · Validated by ARealMe Cognitive Analytics',
+    'Cryptographically bound to test session · Validated by ARealMe Cognitive Analytics',
     470,
     588,
-    '500 11px "Inter", "PingFang SC", sans-serif',
+    '500 11px "Inter", sans-serif',
     '#9CA3AF',
     'left'
   );
