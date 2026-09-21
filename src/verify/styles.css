@@ -321,7 +321,8 @@ body {
 
 .cert-canvas-box {
   width: 100%;
-  max-width: 860px;
+  max-width: 960px;
+  aspect-ratio: 1600 / 1000;
   margin: 0 auto 20px;
   border-radius: 14px;
   overflow: hidden;
@@ -331,8 +332,39 @@ body {
 
 .cert-canvas-box canvas {
   width: 100%;
-  height: auto;
+  height: 100%;
   display: block;
+}
+
+/* Disclaimer Card */
+.disclaimer-card {
+  margin-top: 32px;
+  background: rgba(30, 35, 45, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 18px 22px;
+  text-align: left;
+}
+
+.disclaimer-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.disclaimer-header h3 {
+  font-size: 14px;
+  font-weight: 700;
+  color: #D1D5DB;
+  margin: 0;
+}
+
+.disclaimer-body {
+  font-size: 13px;
+  line-height: 1.6;
+  color: #9CA3AF;
+  margin: 0;
 }
 
 .btn-download-cert {

@@ -142,11 +142,11 @@ export const BLACKLIST = [
 ];
 
 /** Canonical SEO-friendly verification base path (no trailing slash). */
-export const DEFAULT_VERIFY_BASE_URL = 'https://www.arealme.com/cert/iq/v';
+export const DEFAULT_VERIFY_BASE_URL = 'https://www.arealme.com/iq/cert/v';
 
 /**
  * Build a path-based verification URL:
- *   https://www.arealme.com/cert/iq/v/<base64url-token>
+ *   https://www.arealme.com/iq/cert/v/<compact-token>
  */
 export function buildVerifyUrl(token: string, baseUrl: string = DEFAULT_VERIFY_BASE_URL): string {
   const base = baseUrl.replace(/\/+$/, '');
@@ -155,7 +155,9 @@ export function buildVerifyUrl(token: string, baseUrl: string = DEFAULT_VERIFY_B
 
 /**
  * Extract a certificate token from either:
+ *   /iq/cert/v/<token>
  *   /cert/iq/v/<token>
+ *   /iq/cert/verify/<token>
  *   /cert/iq/verify/<token>
  *   ?d=<token>   (legacy query form)
  */

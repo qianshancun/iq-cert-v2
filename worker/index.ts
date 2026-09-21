@@ -37,23 +37,31 @@ function escapeHtml(value: string): string {
 }
 
 /**
- * Rewrite /cert/iq/... → /... so Cloudflare Assets can serve dist/verify files.
+ * Rewrite /iq/cert/... or /cert/iq/... → /... so Cloudflare Assets can serve dist/verify files.
  * Keep /v/<token> and /verify/<token> as SPA entry (index.html).
  */
 function toAssetPath(pathname: string): string {
   let assetPath = pathname;
-  if (assetPath === '/cert/iq' || assetPath === '/cert/iq/') {
-    return '/';
+  if (
+    assetPath === '/iq/cert' ||
+    assetPath === '/iq/cert/' ||
+    assetPath === '/cert/iq' ||
+    assetPath === '/cert/iq/'
+  ) {
+    return '/index.html';
   }
-  if (assetPath.startsWith('/cert/iq/')) {
+
+  if (assetPath.startsWith('/iq/cert/')) {
+    assetPath = assetPath.slice('/iq/cert'.length);
+  } else if (assetPath.startsWith('/cert/iq/')) {
     assetPath = assetPath.slice('/cert/iq'.length);
   }
 
   // Path-token routes are SPA pages — always serve index.html
   if (/^\/(?:v|verify)(?:\/|$)/.test(assetPath)) {
-    return '/';
+    return '/index.html';
   }
-  return assetPath || '/';
+  return assetPath || '/index.html';
 }
 
 export default {
@@ -72,7 +80,14 @@ export default {
       });
     }
 
-    // 2. Serve runtime engine with CORS
+    // 2. Legacy /cert/iq/... → 301 permanent redirect to new canonical /iq/cert/...
+    if (path.startsWith('/cert/iq')) {
+      const canonicalUrl = new URL(request.url);
+      canonicalUrl.pathname = path.replace('/cert/iq', '/iq/cert');
+      return Response.redirect(canonicalUrl.toString(), 301);
+    }
+
+    // 3. Serve runtime engine with CORS
     if (path.endsWith('/iq-cert.js') || path.endsWith('/iq-cert.v2.js')) {
       const assetResponse = await env.ASSETS.fetch(new Request(new URL('/iq-cert.js', url.origin)));
       if (assetResponse.status === 200) {
@@ -84,15 +99,15 @@ export default {
       }
     }
 
-    // 3. Legacy ?d=<token> → permanent redirect to SEO path /cert/iq/v/<token>
+    // 4. Legacy ?d=<token> → permanent redirect to SEO path /iq/cert/v/<token>
     const queryToken = url.searchParams.get('d');
     if (queryToken && !path.match(/\/(?:v|verify)\/[^/?#]+/)) {
       const seoUrl = new URL(url.origin);
-      seoUrl.pathname = `/cert/iq/v/${queryToken}`;
+      seoUrl.pathname = `/iq/cert/v/${queryToken}`;
       return Response.redirect(seoUrl.toString(), 301);
     }
 
-    // 4. Extract token from path (or remaining query) for bot OG / human SPA
+    // 5. Extract token from path for bot OG / human SPA
     const token = extractTokenFromLocation(path, url.searchParams);
 
     if (token && isBot(request.headers.get('User-Agent'))) {
@@ -108,7 +123,7 @@ export default {
           ? 'https://www.arealme.com/iq/'
           : `https://www.arealme.com/iq/${cleanLang}/`;
 
-        const canonical = `${url.origin}/cert/iq/v/${token}`;
+        const canonical = `${url.origin}/iq/cert/v/${token}`;
         const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -133,18 +148,18 @@ export default {
 </body>
 </html>`;
         return new Response(html, {
+          status: 200,
           headers: {
             'Content-Type': 'text/html; charset=utf-8',
-            'Cache-Control': 'public, max-age=600',
+            'Cache-Control': 'public, max-age=3600, stale-while-revalidate=86400',
           },
         });
       }
     }
 
-    // 5. Forward to static assets (SPA)
+    // 6. Forward human requests to static assets
     const assetUrl = new URL(request.url);
     assetUrl.pathname = toAssetPath(path);
-    assetUrl.search = '';
     return env.ASSETS.fetch(new Request(assetUrl, request));
   },
 };

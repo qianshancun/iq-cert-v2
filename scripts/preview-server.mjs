@@ -20,16 +20,24 @@ const server = http.createServer((req, res) => {
   const url = new URL(req.url, `http://${req.headers.host}`);
   let pathname = url.pathname;
 
-  // Legacy ?d=<token> → 301 to /cert/iq/v/<token>
+  // Legacy ?d=<token> → 301 to /iq/cert/v/<token>
   const queryToken = url.searchParams.get('d');
   if (queryToken && !pathname.match(/\/(?:v|verify)\/[^/?#]+/)) {
-    res.writeHead(301, { Location: `/cert/iq/v/${queryToken}` });
+    res.writeHead(301, { Location: `/iq/cert/v/${queryToken}` });
     res.end();
     return;
   }
 
-  // SPA: /cert/iq/v, /cert/iq/v/<token>, /cert/iq/verify/<token>
-  if (pathname.startsWith('/cert/iq/v') || pathname.startsWith('/cert/iq/verify')) {
+  // Redirect legacy /cert/iq to /iq/cert
+  if (pathname.startsWith('/cert/iq')) {
+    const newPath = pathname.replace('/cert/iq', '/iq/cert');
+    res.writeHead(301, { Location: newPath + (url.search || '') });
+    res.end();
+    return;
+  }
+
+  // SPA: /iq/cert/v, /iq/cert/v/<token>, /iq/cert/verify/<token>
+  if (pathname.startsWith('/iq/cert/v') || pathname.startsWith('/iq/cert/verify')) {
     const filePath = path.join(ROOT, 'dist/verify/index.html');
     if (fs.existsSync(filePath)) {
       res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
@@ -38,23 +46,22 @@ const server = http.createServer((req, res) => {
     }
   }
 
-  // Strip /cert/iq prefix for assets if present
+  // Strip /iq/cert prefix for assets if present
   let cleanPathname = pathname;
-  if (cleanPathname === '/cert/iq' || cleanPathname === '/cert/iq/') {
+  if (cleanPathname === '/iq/cert' || cleanPathname === '/iq/cert/') {
     cleanPathname = '/';
-  } else if (cleanPathname.startsWith('/cert/iq/')) {
-    cleanPathname = cleanPathname.slice('/cert/iq'.length) || '/';
+  } else if (cleanPathname.startsWith('/iq/cert/')) {
+    cleanPathname = cleanPathname.slice('/iq/cert'.length) || '/';
   }
 
-  // Route: /cert/iq-cert.js or /iq-cert.js
+  // Route: /iq/cert/iq-cert.js or /iq-cert.js
   if (cleanPathname === '/iq-cert.js' || pathname.endsWith('/iq-cert.js')) {
     cleanPathname = '/dist/iq-cert.js';
   }
 
   // Default redirect root to test-harness.html
   if (cleanPathname === '/' || cleanPathname === '/index.html') {
-    // Only for bare /cert/iq/ — SPA already handled above for /v
-    if (!pathname.startsWith('/cert/iq/v') && !pathname.startsWith('/cert/iq/verify')) {
+    if (!pathname.startsWith('/iq/cert/v') && !pathname.startsWith('/iq/cert/verify')) {
       cleanPathname = '/test-harness.html';
     } else {
       cleanPathname = '/index.html';
@@ -87,5 +94,5 @@ const server = http.createServer((req, res) => {
 
 server.listen(PORT, () => {
   console.log(`\n🚀 Preview Server running at: http://localhost:${PORT}/test-harness.html`);
-  console.log(`📜 Verification Page at: http://localhost:${PORT}/cert/iq/v/<token>`);
+  console.log(`📜 Verification Page at: http://localhost:${PORT}/iq/cert/v`);
 });

@@ -8,6 +8,16 @@ export function getArchetype(score: number): IQArchetype {
   return ARCHETYPES[ARCHETYPES.length - 1];
 }
 
+export function formatDisplayRef(id?: string): string {
+  if (!id) return '2026';
+  const clean = id.trim();
+  // If standard UUID, format compactly as 13 chars e.g. FEEDFF53-5B67
+  if (/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(clean)) {
+    return clean.slice(0, 13).toUpperCase();
+  }
+  return clean.slice(0, 24).toUpperCase();
+}
+
 export function normalizeDimensions(
   input?: IQDimensionScore[] | Record<string, number> | number[]
 ): IQDimensionScore[] {
@@ -40,7 +50,6 @@ export function normalizeDimensions(
     }));
   }
 
-  // Default fallback values if no dimension data was provided
   return [
     { key: 'pattern', label: 'Pattern', percent: 80 },
     { key: 'spatial', label: 'Spatial', percent: 82 },
@@ -102,17 +111,18 @@ export function drawWrappedText(
   let curY = y;
 
   for (let n = 0; n < words.length; n++) {
-    const testLine = line + (line && text.includes(' ') ? ' ' : '') + words[n];
+    const testLine = line + words[n] + (text.includes(' ') ? ' ' : '');
     const metrics = ctx.measureText(testLine);
-    if (metrics.width > maxWidth && n > 0) {
-      ctx.fillText(line, x, curY);
-      line = words[n];
+    const testWidth = metrics.width;
+    if (testWidth > maxWidth && n > 0) {
+      ctx.fillText(line.trim(), x, curY);
+      line = words[n] + (text.includes(' ') ? ' ' : '');
       curY += lineHeight;
     } else {
       line = testLine;
     }
   }
-  ctx.fillText(line, x, curY);
+  ctx.fillText(line.trim(), x, curY);
   ctx.restore();
   return curY + lineHeight;
 }
@@ -124,28 +134,28 @@ export function drawProgressBar(
   width: number,
   height: number,
   percent: number,
-  bgColor: string,
-  fillColor: string,
-  radius: number = 3
+  trackColor: string,
+  barColor: string,
+  borderRadius: number = 4
 ): void {
   ctx.save();
-  // Background
-  ctx.fillStyle = bgColor;
-  if (typeof ctx.roundRect === 'function') {
+  // Track background
+  ctx.fillStyle = trackColor;
+  if (ctx.roundRect) {
     ctx.beginPath();
-    ctx.roundRect(x, y, width, height, radius);
+    ctx.roundRect(x, y, width, height, borderRadius);
     ctx.fill();
   } else {
     ctx.fillRect(x, y, width, height);
   }
 
-  // Active fill
+  // Active bar
   const fillWidth = Math.max(0, Math.min(width, (width * percent) / 100));
   if (fillWidth > 0) {
-    ctx.fillStyle = fillColor;
-    if (typeof ctx.roundRect === 'function') {
+    ctx.fillStyle = barColor;
+    if (ctx.roundRect) {
       ctx.beginPath();
-      ctx.roundRect(x, y, fillWidth, height, radius);
+      ctx.roundRect(x, y, fillWidth, height, borderRadius);
       ctx.fill();
     } else {
       ctx.fillRect(x, y, fillWidth, height);
@@ -163,7 +173,7 @@ export function drawRadarChart(
   centerY: number,
   radius: number,
   dimensions: IQDimensionScore[],
-  lang: string,
+  _lang: string,
   theme: {
     gridColor: string;
     axisColor: string;
@@ -240,17 +250,16 @@ export function drawRadarChart(
   ctx.fillStyle = theme.strokeColor;
   for (const pt of points) {
     ctx.beginPath();
-    ctx.arc(pt.x, pt.y, 4, 0, Math.PI * 2);
+    ctx.arc(pt.x, pt.y, 4.5, 0, Math.PI * 2);
     ctx.fill();
   }
 
-  // Draw outer labels
-  const isZh = lang === 'cn' || lang === 'zh-CN';
-  ctx.font = 'bold 11px "Inter", "PingFang SC", "Microsoft YaHei", sans-serif';
+  // Draw outer labels (always English on certificates)
+  ctx.font = '600 13px "Inter", sans-serif';
 
   for (let i = 0; i < count; i++) {
     const angle = startAngle + i * angleStep;
-    const labelDist = radius + 22;
+    const labelDist = radius + 26;
     const lx = centerX + Math.cos(angle) * labelDist;
     const ly = centerY + Math.sin(angle) * labelDist;
 

@@ -1,5 +1,5 @@
 import type { IQCertificatePayload } from '../../shared/types';
-import { drawRadarChart, drawText, getArchetype, normalizeDimensions } from './common';
+import { drawRadarChart, drawText, formatDisplayRef, getArchetype, normalizeDimensions } from './common';
 import { drawQrOnCanvas } from '../qr';
 
 export function renderRoyal(
@@ -9,20 +9,21 @@ export function renderRoyal(
 ): void {
   const archetype = getArchetype(payload.s);
   const dimensions = normalizeDimensions(payload.m);
+  const displayRef = formatDisplayRef(payload.id);
 
-  // 1. Radial Background
-  const grad = ctx.createRadialGradient(600, 315, 50, 600, 315, 750);
+  // 1. Radial Background (1600 x 1000)
+  const grad = ctx.createRadialGradient(800, 500, 80, 800, 500, 950);
   grad.addColorStop(0, '#241F18');
   grad.addColorStop(1, '#080706');
   ctx.fillStyle = grad;
-  ctx.fillRect(0, 0, 1200, 630);
+  ctx.fillRect(0, 0, 1600, 1000);
 
-  // 2. Gold Dust Particles (pseudo-random with deterministic pseudo-seed)
+  // 2. Gold Dust Particles
   ctx.save();
-  for (let i = 0; i < 280; i++) {
-    const px = ((i * 12345 + 6789) % 1160) + 20;
-    const py = ((i * 54321 + 9876) % 590) + 20;
-    const sz = (i % 3) * 0.8 + 0.6;
+  for (let i = 0; i < 350; i++) {
+    const px = ((i * 12345 + 6789) % 1540) + 30;
+    const py = ((i * 54321 + 9876) % 940) + 30;
+    const sz = (i % 3) * 0.9 + 0.6;
     const alpha = ((i % 5) + 2) * 0.12;
     ctx.fillStyle = `rgba(234, 179, 8, ${alpha})`;
     ctx.fillRect(px, py, sz, sz);
@@ -33,24 +34,24 @@ export function renderRoyal(
   ctx.save();
   ctx.lineWidth = 3;
   ctx.strokeStyle = '#D4AF37';
-  ctx.strokeRect(20, 20, 1160, 590);
+  ctx.strokeRect(24, 24, 1552, 952);
 
-  ctx.lineWidth = 1;
+  ctx.lineWidth = 1.5;
   ctx.strokeStyle = '#856A28';
-  ctx.strokeRect(28, 28, 1144, 574);
+  ctx.strokeRect(34, 34, 1532, 932);
 
   // Corner Gold Knots
   const corners = [
-    [28, 28],
-    [1172, 28],
-    [28, 602],
-    [1172, 602],
+    [34, 34],
+    [1566, 34],
+    [34, 966],
+    [1566, 966],
   ];
   ctx.strokeStyle = '#FACC15';
-  ctx.lineWidth = 2;
+  ctx.lineWidth = 2.5;
   for (const [cx, cy] of corners) {
     ctx.beginPath();
-    ctx.arc(cx, cy, 7, 0, Math.PI * 2);
+    ctx.arc(cx, cy, 8, 0, Math.PI * 2);
     ctx.stroke();
   }
   ctx.restore();
@@ -59,48 +60,48 @@ export function renderRoyal(
   drawText(
     ctx,
     'AREALME HIGH INTELLECT COUNCIL · IMPERIAL CHARTER',
-    600,
-    58,
-    '700 13px "Cinzel", "Times New Roman", serif',
+    800,
+    75,
+    '700 16px "Cinzel", "Times New Roman", serif',
     '#C5A059',
     'center',
-    900
+    1200
   );
 
   drawText(
     ctx,
     'CONFERMENT OF SUPREME INTELLECTUAL DIGNITY',
-    600,
-    88,
-    '700 24px "Cinzel", "Times New Roman", serif',
+    800,
+    120,
+    '700 32px "Cinzel", "Times New Roman", serif',
     '#F5E6BE',
     'center',
-    960
+    1300
   );
 
-  // Divider Line with diamond in middle
+  // Divider Line
   ctx.strokeStyle = '#856A28';
-  ctx.lineWidth = 1.5;
+  ctx.lineWidth = 2;
   ctx.beginPath();
-  ctx.moveTo(350, 108);
-  ctx.lineTo(850, 108);
+  ctx.moveTo(480, 146);
+  ctx.lineTo(1120, 146);
   ctx.stroke();
 
   // 5. Left Column: Bearer Info & Score
-  const leftX = 70;
+  const leftX = 90;
 
   drawText(
     ctx,
     'ACCREDITED CANDIDATE',
     leftX,
-    145,
-    '600 12px "Inter", sans-serif',
+    195,
+    '600 14px "Inter", sans-serif',
     '#A1824A',
     'left'
   );
 
   // Gold Shimmering Bearer Name
-  const nameGrad = ctx.createLinearGradient(leftX, 175, leftX + 400, 175);
+  const nameGrad = ctx.createLinearGradient(leftX, 230, leftX + 500, 230);
   nameGrad.addColorStop(0, '#FFF5D0');
   nameGrad.addColorStop(0.5, '#EAB308');
   nameGrad.addColorStop(1, '#CA8A04');
@@ -109,11 +110,11 @@ export function renderRoyal(
     ctx,
     payload.n.toUpperCase(),
     leftX,
-    185,
-    '800 36px "Cinzel", "Times New Roman", "PingFang SC", serif',
+    250,
+    '800 48px "Cinzel", "Times New Roman", serif',
     nameGrad as unknown as string,
     'left',
-    440
+    560
   );
 
   // Conferred Title
@@ -122,45 +123,49 @@ export function renderRoyal(
     ctx,
     `CONFERRED TITLE OF ROYAL DISTINCTION: ${title}`,
     leftX,
-    228,
-    '700 14px "Inter", sans-serif',
+    305,
+    '700 16px "Inter", sans-serif',
     '#E6CA85',
     'left',
-    460
+    580
   );
 
-  // Royal Score Box
+  // Royal Score Box (ends at x = 570)
+  const scoreBoxW = 480;
+  const scoreBoxH = 470;
+  const scoreBoxY = 350;
+
   ctx.fillStyle = 'rgba(25, 20, 12, 0.75)';
-  ctx.fillRect(leftX, 260, 430, 215);
+  ctx.fillRect(leftX, scoreBoxY, scoreBoxW, scoreBoxH);
   ctx.strokeStyle = '#C5A059';
-  ctx.lineWidth = 1.5;
-  ctx.strokeRect(leftX, 260, 430, 215);
+  ctx.lineWidth = 2;
+  ctx.strokeRect(leftX, scoreBoxY, scoreBoxW, scoreBoxH);
 
   drawText(
     ctx,
     'OFFICIAL STANDARDIZED IQ RATING',
-    leftX + 215,
-    292,
-    '700 13px "Inter", sans-serif',
+    leftX + scoreBoxW / 2,
+    395,
+    '700 15px "Inter", sans-serif',
     '#A1824A',
     'center'
   );
 
   // Glowing IQ number
-  const scoreGrad = ctx.createLinearGradient(0, 310, 0, 410);
+  const scoreGrad = ctx.createLinearGradient(0, 430, 0, 560);
   scoreGrad.addColorStop(0, '#FFFFFF');
   scoreGrad.addColorStop(0.5, '#FDE047');
   scoreGrad.addColorStop(1, '#CA8A04');
 
   ctx.save();
   ctx.shadowColor = 'rgba(234, 179, 8, 0.45)';
-  ctx.shadowBlur = 25;
+  ctx.shadowBlur = 30;
   drawText(
     ctx,
     String(payload.s),
-    leftX + 215,
-    360,
-    '900 90px "Cinzel", "Times New Roman", serif',
+    leftX + scoreBoxW / 2,
+    500,
+    '900 130px "Cinzel", "Times New Roman", serif',
     scoreGrad as unknown as string,
     'center'
   );
@@ -169,27 +174,42 @@ export function renderRoyal(
   drawText(
     ctx,
     `TIER: ${archetype.percentile.toUpperCase()} WORLDWIDE`,
-    leftX + 215,
-    428,
-    '800 14px "Inter", sans-serif',
+    leftX + scoreBoxW / 2,
+    605,
+    '800 17px "Inter", sans-serif',
     '#FACC15',
     'center'
   );
 
+  // 2-line clean reference inside score box
   drawText(
     ctx,
-    `REF: ARM-ROYAL-${payload.id || '2026'} · ISSUED: ${payload.d}`,
-    leftX + 215,
-    455,
-    '500 11px "Inter", monospace',
+    `REF: ARM-ROYAL-${displayRef}`,
+    leftX + scoreBoxW / 2,
+    720,
+    '600 13px "Inter", monospace',
     '#856A28',
-    'center'
+    'center',
+    440
   );
 
-  // 6. Right Column: 7-Axis Heptagonal Radar Chart (Cognitive Astrolabe)
-  const radarCenterX = 730;
-  const radarCenterY = 370;
-  const radarRadius = 125;
+  drawText(
+    ctx,
+    `ISSUED: ${payload.d}`,
+    leftX + scoreBoxW / 2,
+    750,
+    '500 13px "Inter", monospace',
+    '#856A28',
+    'center',
+    440
+  );
+
+  // 6. Center-Right Column: 7-Axis Heptagonal Radar Chart (Cognitive Astrolabe)
+  // Center is at 1000, 560 with radius 175.
+  // Leftmost label extends to 1000 - (175+26) - 150 = 649, which is 79px to the right of scoreBox (ends at 570)!
+  const radarCenterX = 1000;
+  const radarCenterY = 560;
+  const radarRadius = 175;
 
   drawRadarChart(ctx, radarCenterX, radarCenterY, radarRadius, dimensions, 'en', {
     gridColor: 'rgba(212, 175, 55, 0.25)',
@@ -204,30 +224,30 @@ export function renderRoyal(
     ctx,
     '7-DIMENSIONAL COGNITIVE ASTROLABE',
     radarCenterX,
-    188,
-    '700 13px "Cinzel", "Inter", sans-serif',
+    270,
+    '700 17px "Cinzel", "Inter", sans-serif',
     '#C5A059',
     'center'
   );
 
   // 7. QR Code in bottom right
-  const qrX = 1000;
-  const qrY = 410;
-  const qrSize = 120;
+  const qrX = 1350;
+  const qrY = 640;
+  const qrSize = 160;
 
   drawQrOnCanvas(ctx, verifyUrl, qrX, qrY, qrSize, {
     darkColor: '#000000',
     lightColor: '#F5E6BE',
     margin: 2,
-    borderRadius: 6,
+    borderRadius: 8,
   });
 
   drawText(
     ctx,
     'SCAN TO VERIFY',
     qrX + qrSize / 2,
-    qrY + qrSize + 16,
-    '700 11px "Inter", sans-serif',
+    qrY + qrSize + 22,
+    '700 13px "Inter", sans-serif',
     '#E6CA85',
     'center'
   );
@@ -236,8 +256,8 @@ export function renderRoyal(
     ctx,
     'arealme.com',
     qrX + qrSize / 2,
-    qrY + qrSize + 32,
-    '500 11px "Inter", monospace',
+    qrY + qrSize + 42,
+    '500 12px "Inter", monospace',
     '#856A28',
     'center'
   );
@@ -246,9 +266,9 @@ export function renderRoyal(
   drawText(
     ctx,
     'Accredited by ARealMe Psychometrics Division · Cryptographically Secured',
-    600,
-    585,
-    '11px "Inter", sans-serif',
+    800,
+    940,
+    '13px "Inter", sans-serif',
     '#856A28',
     'center'
   );

@@ -13,6 +13,14 @@
   },
   "routes": [
     {
+      "pattern": "www.arealme.com/iq/cert",
+      "zone_name": "arealme.com"
+    },
+    {
+      "pattern": "www.arealme.com/iq/cert/*",
+      "zone_name": "arealme.com"
+    },
+    {
       "pattern": "www.arealme.com/cert/iq",
       "zone_name": "arealme.com"
     },
@@ -23,7 +31,7 @@
   ],
   "vars": {
     "ENV": "production",
-    "APP_BASE_URL": "https://www.arealme.com/cert/iq",
+    "APP_BASE_URL": "https://www.arealme.com/iq/cert",
     "IQ_TEST_URL_EN": "https://www.arealme.com/iq/",
     "IQ_TEST_URL_CN": "https://www.arealme.com/iq/cn/"
   },
