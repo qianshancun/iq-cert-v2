@@ -16,6 +16,16 @@ let html = fs.readFileSync('src/verify/index.html', 'utf8');
 fs.writeFileSync(path.join(verifyDist, 'index.html'), html, 'utf8');
 fs.copyFileSync('src/verify/styles.css', path.join(verifyDist, 'styles.css'));
 
+// 1b. Copy assets to dist/verify/assets
+const assetsSrc = path.resolve('src/assets');
+const assetsDist = path.join(verifyDist, 'assets');
+if (fs.existsSync(assetsSrc)) {
+  fs.mkdirSync(assetsDist, { recursive: true });
+  for (const file of fs.readdirSync(assetsSrc)) {
+    fs.copyFileSync(path.join(assetsSrc, file), path.join(assetsDist, file));
+  }
+}
+
 // 2. Bundle main.ts
 const ctx = await esbuild.context({
   entryPoints: ['src/verify/main.ts'],

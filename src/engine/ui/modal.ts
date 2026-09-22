@@ -510,7 +510,8 @@ export class CertificateModal {
             </div>
             <div class="arm-cert-actions">
               <button class="arm-cert-btn arm-cert-btn-download" id="arm-cert-download-btn">
-                <span>⬇️</span> ${t.btnDownload}
+                <img src="https://areal.me/static/iq/assets/diskette.png" alt="" class="download-img" width="18" height="18" style="vertical-align: -0.15em;" />
+                ${t.btnDownload}
               </button>
               <button class="arm-cert-btn arm-cert-btn-online" id="arm-cert-online-btn">
                 <span>🔗</span> ${t.btnVerifyOnline}

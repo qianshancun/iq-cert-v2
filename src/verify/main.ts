@@ -3,15 +3,12 @@ import { getDimensionsI18n, getVerifyI18n, normalizeLang } from '../shared/i18n'
 import { decodeCertificateToken } from '../shared/token';
 import type { IQCertDesign, IQCertificatePayload } from '../shared/types';
 import { ensureCertFonts } from '../engine/fonts';
-import { renderCertificate, renderCertificateToDataUrl } from '../engine/renderers';
-import { drawRadarChart, formatDisplayRef, getArchetype, normalizeDimensions } from '../engine/renderers/common';
+import { renderCertificate } from '../engine/renderers';
+import { drawRadarChart, FONT, font, formatDisplayRef, getArchetype, normalizeDimensions } from '../engine/renderers/common';
 
 function getBacktrackUrl(lang?: string): string {
   const clean = normalizeLang(lang);
-  if (!clean || clean === 'en') {
-    return 'https://www.arealme.com/iq/';
-  }
-  return `https://www.arealme.com/iq/${clean}/`;
+  return `https://www.arealme.com/iq/${clean || 'en'}/`;
 }
 
 // Fallback demo data if opened without URL parameters
@@ -88,11 +85,17 @@ class VerificationApp {
               <p>${t.brandDesc}</p>
             </div>
           </a>
+          <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Toggle dark mode" title="Toggle dark/light mode" data-site-action="toggle-theme"><svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg><svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg></button>
         </header>
 
         <!-- Verification Banner -->
         <div class="verified-banner ${this.isAuthentic ? '' : 'unverified'}">
-          <div class="shield-icon">${this.isAuthentic ? '🛡️' : '⚠️'}</div>
+          <div class="shield-icon">
+            ${this.isAuthentic 
+              ? `<svg class="svg-icon shield-svg" viewBox="0 0 428.16 428.16" fill="currentColor"><path d="M393.8,110.208c-0.512-11.264-0.512-22.016-0.512-32.768c0-8.704-6.656-15.36-15.36-15.36 c-64,0-112.64-18.432-153.088-57.856c-6.144-5.632-15.36-5.632-21.504,0C162.888,43.648,114.248,62.08,50.248,62.08 c-8.704,0-15.36,6.656-15.36,15.36c0,10.752,0,21.504-0.512,32.768c-2.048,107.52-5.12,254.976,174.592,316.928l5.12,1.024 l5.12-1.024C398.408,365.184,395.848,218.24,393.8,110.208z M201.8,259.2c-3.072,2.56-6.656,4.096-10.752,4.096h-0.512 c-4.096,0-8.192-2.048-10.752-5.12l-47.616-52.736l23.04-20.48l37.376,41.472l82.944-78.848l20.992,22.528L201.8,259.2z"/></svg>`
+              : `⚠️`
+            }
+          </div>
           <div class="verified-banner-text">
             <h2>${this.isAuthentic ? t.verifiedTitle : t.tamperedTitle}</h2>
             <p>${this.isAuthentic ? t.verifiedDesc : t.tamperedDesc}</p>
@@ -114,11 +117,14 @@ class VerificationApp {
             </div>
           </div>
 
-          <p style="margin-top: 18px; font-size: 14px; color: #9CA3AF; line-height: 1.6;">${subtitle}</p>
+          <p style="margin-top: 18px; font-size: 14px; color: var(--text-muted); line-height: 1.6;">${subtitle}</p>
 
           <!-- 7 Dimensions Analysis -->
           <section class="dimensions-section">
-            <div class="section-title">📊 ${t.dimensionsTitle}</div>
+            <div class="section-title">
+              <svg class="svg-icon dim-svg" viewBox="0 0 682.66669 682.66669"><g transform="matrix(1.3333333,0,0,-1.3333333,0,682.66667)"><g transform="translate(256,485.1982)"><path d="M 0,0 241,-175.092 148.933,-458.396 H -148.933 L -241,-175.092 Z" style="fill:none;stroke:currentColor;stroke-width:30;stroke-linecap:round;stroke-linejoin:round;"/></g><g transform="translate(256,366.9473)"><path d="m 0,0 168.931,-80.255 -95.298,-156.247 -174.991,-38.15 v 172.441 z" style="fill:none;stroke:currentColor;stroke-width:30;stroke-linecap:round;stroke-linejoin:round;"/></g><g transform="translate(256,485.1982)"><path d="m 0,0 v -253.396 l 241,78.304 -241,-78.304 148.933,-205 -148.933,205 -148.933,-205 148.933,205 -241,78.304 241,-78.304 z" style="fill:none;stroke:currentColor;stroke-width:30;stroke-linecap:round;stroke-linejoin:round;"/></g></g></svg>
+              ${t.dimensionsTitle}
+            </div>
 
             <!-- Radar Astrolabe Canvas -->
             <div class="radar-wrap">
@@ -160,14 +166,15 @@ class VerificationApp {
             </div>
 
             <button class="btn-download-cert" id="btn-download-png">
-              <span>⬇️</span> ${t.downloadCert}
+              <img src="https://areal.me/static/iq/assets/diskette.png" alt="" class="download-img" width="18" height="18" />
+              ${t.downloadCert}
             </button>
           </section>
 
           <!-- Rule 5: Verification Page Disclaimer -->
           <section class="disclaimer-card">
             <div class="disclaimer-header">
-              <span class="disclaimer-icon">ℹ️</span>
+              <svg class="svg-icon disclaimer-svg" viewBox="0 0 60 60" fill="currentColor"><path d="m30 5c-13.7799683 0-25 11.210022-25 25s11.2200317 25 25 25c13.7900391 0 25-11.210022 25-25s-11.2099609-25-25-25zm0 42.75c-2.2000122 0-4-1.789978-4-4s1.7999878-4 4-4c2.210022 0 4 1.789978 4 4s-1.789978 4-4 4zm4.2000122-14.7699585c-.0999756 2.2599487-1.9400024 4.0199585-4.2000122 4.0199585-2.25 0-4.0999756-1.7600098-4.1900024-4.0199585l-.6900024-15.6300049c-.0599976-1.3400269.4200439-2.6199951 1.3500366-3.5900269.9299926-.9699706 2.1900024-1.5100097 3.5299682-1.5100097 1.3500366 0 2.6000366.5400391 3.5400391 1.5100098.9299927.9700317 1.4099731 2.25 1.3499756 3.5900269z"/></svg>
               <h3>${t.disclaimerTitle}</h3>
             </div>
             <p class="disclaimer-body">${t.disclaimerText}</p>
@@ -175,7 +182,10 @@ class VerificationApp {
 
           <!-- ShareKit Component -->
           <section class="share-section">
-            <p>🌐 ${t.sharePrompt}</p>
+            <p>
+              <svg class="svg-icon share-svg" viewBox="0 0 24 24" fill="currentColor"><path d="m6.577 17.965-1.133.529c-.875.408-1.917.029-2.325-.847l-1.691-3.625c-.408-.876-.029-1.917.847-2.326l1.133-.528zm-1.921-7.669 7.187-6.454c.412-.37.976-.523 1.519-.412s1.002.472 1.236.975l4.353 9.335c.234.503.217 1.087-.047 1.574-.265.488-.744.821-1.293.899l-9.563 1.356z"/><path d="m21.669 5.963c.375-.175.822-.012.997.363.174.375.012.821-.363.996l-1.813.846c-.375.175-.822.012-.997-.363-.174-.375-.012-.822.363-.997z"/><path d="m22.223 12.015c.389.142.59.573.448.962-.141.389-.572.589-.961.448l-1.879-.684c-.389-.142-.59-.572-.448-.961.141-.389.572-.59.961-.449z"/><path d="m16.649 2.572c.142-.389.573-.59.962-.448.389.141.589.572.448.961l-.684 1.879c-.142.389-.572.59-.961.449-.389-.142-.59-.573-.449-.962z"/><path d="m11.594 18.076.435.933c.409.876.03 1.917-.846 2.326l-.907.422c-.875.409-1.917.03-2.325-.846l-.951-2.039.444-.207z"/></svg>
+              ${t.sharePrompt}
+            </p>
             <social-share
               id="social-share-btn"
               style="display: block; min-height: 48px;"
@@ -206,7 +216,7 @@ class VerificationApp {
 
     this.bindEvents();
     this.drawRadar();
-    this.initCertCanvas();
+    void this.initCertCanvas();
   }
 
   private bindEvents(): void {
@@ -225,10 +235,35 @@ class VerificationApp {
       if (!this.certCanvas) return;
       const a = document.createElement('a');
       a.download = `AREALME-IQ-Certificate-${this.payload.s}-${this.payload.n.replace(/\s+/g, '_')}.png`;
-      a.href =
-        renderCertificateToDataUrl(this.selectedDesign, this.payload, window.location.href, 2) ||
-        this.certCanvas.toDataURL('image/png');
+      a.href = this.certCanvas.toDataURL('image/png');
       a.click();
+    });
+
+    // Theme Toggle (Dark / Light)
+    const toggleBtn = document.getElementById('theme-toggle');
+    const getStoredTheme = () => {
+      const stored = localStorage.getItem('arealme_theme');
+      if (stored === 'light' || stored === 'dark') return stored;
+      return window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+    };
+
+    const applyTheme = (theme: 'dark' | 'light') => {
+      if (theme === 'light') {
+        document.documentElement.setAttribute('data-theme', 'light');
+      } else {
+        document.documentElement.removeAttribute('data-theme');
+      }
+      this.drawRadar();
+    };
+
+    // Apply initial theme
+    applyTheme(getStoredTheme());
+
+    toggleBtn?.addEventListener('click', () => {
+      const current = document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
+      const next = current === 'light' ? 'dark' : 'light';
+      localStorage.setItem('arealme_theme', next);
+      applyTheme(next);
     });
   }
 
@@ -238,29 +273,34 @@ class VerificationApp {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
+    const isLight = document.documentElement.getAttribute('data-theme') === 'light';
     const dimensions = normalizeDimensions(this.payload.m);
     ctx.clearRect(0, 0, 400, 400);
 
     drawRadarChart(ctx, 200, 200, 130, dimensions, 'en', {
-      gridColor: 'rgba(255, 255, 255, 0.1)',
-      axisColor: 'rgba(255, 255, 255, 0.15)',
-      fillColor: 'rgba(16, 185, 129, 0.25)',
-      strokeColor: '#10B981',
-      labelColor: '#9CA3AF',
-      valueColor: '#10B981',
+      gridColor: isLight ? 'rgba(0, 0, 0, 0.1)' : 'rgba(255, 255, 255, 0.1)',
+      axisColor: isLight ? 'rgba(0, 0, 0, 0.15)' : 'rgba(255, 255, 255, 0.15)',
+      fillColor: isLight ? 'rgba(5, 150, 105, 0.2)' : 'rgba(16, 185, 129, 0.25)',
+      strokeColor: isLight ? '#059669' : '#10B981',
+      labelColor: isLight ? '#475569' : '#9CA3AF',
+      valueColor: isLight ? '#059669' : '#10B981',
+      labelFont: font(600, 13, FONT.grotesk),
+      dotRadius: 4.5,
+      lineWidth: 2.5,
     });
   }
 
-  private initCertCanvas(): void {
+  private async initCertCanvas(): Promise<void> {
     this.certCanvas = document.getElementById('view-cert-canvas') as HTMLCanvasElement | null;
     if (this.certCanvas) {
       this.certCtx = this.certCanvas.getContext('2d');
-      // Draw once the certificate typefaces are in memory (bounded by the font timeout),
-      // and again if any face arrives late.
-      void ensureCertFonts(this.payload.n).then(() => this.drawCertificate());
-      try {
-        document.fonts?.addEventListener('loadingdone', () => this.drawCertificate());
-      } catch (_e) {}
+      this.drawCertificate();
+      // Ensure webfonts load and re-draw for crisp rendering
+      await ensureCertFonts(this.payload.n);
+      this.drawCertificate();
+      if (document.fonts) {
+        document.fonts.ready.then(() => this.drawCertificate());
+      }
     }
   }
 

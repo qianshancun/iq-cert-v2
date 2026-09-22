@@ -120,9 +120,7 @@ export default {
         const pageDesc = `Verified IQ Score of ${payload.s} (${title} · ${archetype.percentile} Worldwide). Inspect the 7-dimension cognitive breakdown and official credentials.`;
 
         const cleanLang = (payload.l || 'en').trim().toLowerCase();
-        const testUrl = !cleanLang || cleanLang === 'en'
-          ? 'https://www.arealme.com/iq/'
-          : `https://www.arealme.com/iq/${cleanLang}/`;
+        const testUrl = `https://www.arealme.com/iq/${cleanLang || 'en'}/`;
 
         const canonical = `${url.origin}/iq/cert/v/${token}`;
         const html = `<!DOCTYPE html>

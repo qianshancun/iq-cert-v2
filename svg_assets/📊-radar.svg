@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   version="1.1"
+   id="svg390"
+   xml:space="preserve"
+   width="682.66669"
+   height="682.66669"
+   viewBox="0 0 682.66669 682.66669"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"><defs
+     id="defs394"><clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath404"><path
+         d="M 0,512 H 512 V 0 H 0 Z"
+         id="path402" /></clipPath><clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath420"><path
+         d="M 0,512 H 512 V 0 H 0 Z"
+         id="path418" /></clipPath></defs><g
+     id="g396"
+     transform="matrix(1.3333333,0,0,-1.3333333,0,682.66667)"><g
+       id="g398"><g
+         id="g400"
+         clip-path="url(#clipPath404)"><g
+           id="g406"
+           transform="translate(256,485.1982)"><path
+             d="M 0,0 241,-175.092 148.933,-458.396 H -148.933 L -241,-175.092 Z"
+             style="fill:none;stroke:#000000;stroke-width:30;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
+             id="path408" /></g></g></g><g
+       id="g410"
+       transform="translate(256,366.9473)"><path
+         d="m 0,0 168.931,-80.255 -95.298,-156.247 -174.991,-38.15 v 172.441 z"
+         style="fill:none;stroke:#000000;stroke-width:30;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
+         id="path412" /></g><g
+       id="g414"><g
+         id="g416"
+         clip-path="url(#clipPath420)"><g
+           id="g422"
+           transform="translate(256,485.1982)"><path
+             d="m 0,0 v -253.396 l 241,78.304 -241,-78.304 148.933,-205 -148.933,205 -148.933,-205 148.933,205 -241,78.304 241,-78.304 z"
+             style="fill:none;stroke:#000000;stroke-width:30;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
+             id="path424" /></g></g></g></g></svg>
