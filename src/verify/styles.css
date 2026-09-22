@@ -290,17 +290,16 @@ body {
   color: var(--primary);
 }
 
-.share-svg {
-  width: 18px;
-  height: 18px;
+.cert-doc-svg {
+  width: 20px;
+  height: 20px;
   color: var(--primary);
 }
 
-.download-img {
+.download-svg {
   width: 18px;
   height: 18px;
   vertical-align: -0.15em;
-  object-fit: contain;
 }
 
 /* 7 Dimensions Section */

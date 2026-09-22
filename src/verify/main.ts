@@ -153,7 +153,10 @@ class VerificationApp {
 
           <!-- Certificate View & Download -->
           <section class="cert-preview-section">
-            <div class="section-title" style="justify-content: center;">📜 ${t.certPreviewTitle}</div>
+            <div class="section-title" style="justify-content: center;">
+              <svg class="svg-icon cert-doc-svg" viewBox="0 0 512 512" fill="currentColor"><path d="m106 512h300c24.814 0 45-20.186 45-45v-317h-105c-24.814 0-45-20.186-45-45v-105h-195c-24.814 0-45 20.186-45 45v422c0 24.814 20.186 45 45 45zm60-301h180c8.291 0 15 6.709 15 15s-6.709 15-15 15h-180c-8.291 0-15-6.709-15-15s6.709-15 15-15zm0 60h180c8.291 0 15 6.709 15 15s-6.709 15-15 15h-180c-8.291 0-15-6.709-15-15s6.709-15 15-15zm0 60h180c8.291 0 15 6.709 15 15s-6.709 15-15 15h-180c-8.291 0-15-6.709-15-15s6.709-15 15-15zm0 60h120c8.291 0 15 6.709 15 15s-6.709 15-15 15h-120c-8.291 0-15-6.709-15-15s6.709-15 15-15z"/><path d="m346 120h96.211l-111.211-111.211v96.211c0 8.276 6.724 15 15 15z"/></svg>
+              ${t.certPreviewTitle}
+            </div>
 
             <div class="cert-style-tabs">
               <button class="cert-tab active" data-style="academic">${t.tabAcademic}</button>
@@ -166,7 +169,7 @@ class VerificationApp {
             </div>
 
             <button class="btn-download-cert" id="btn-download-png">
-              <img src="https://areal.me/static/iq/assets/diskette.png" alt="" class="download-img" width="18" height="18" />
+              <svg class="svg-icon download-svg" viewBox="0 0 32 32" fill="currentColor"><path d="m30.71 7.29-6-6a1 1 0 0 0 -.71-.29h-2v8a2 2 0 0 1 -2 2h-8a2 2 0 0 1 -2-2v-8h-6a3 3 0 0 0 -3 3v24a3 3 0 0 0 3 3h2v-9a3 3 0 0 1 3-3h14a3 3 0 0 1 3 3v9h2a3 3 0 0 0 3-3v-20a1 1 0 0 0 -.29-.71z"/><path d="m12 1h8v8h-8z"/><path d="m23 21h-14a1 1 0 0 0 -1 1v9h16v-9a1 1 0 0 0 -1-1z"/></svg>
               ${t.downloadCert}
             </button>
           </section>
@@ -182,10 +185,7 @@ class VerificationApp {
 
           <!-- ShareKit Component -->
           <section class="share-section">
-            <p>
-              <svg class="svg-icon share-svg" viewBox="0 0 24 24" fill="currentColor"><path d="m6.577 17.965-1.133.529c-.875.408-1.917.029-2.325-.847l-1.691-3.625c-.408-.876-.029-1.917.847-2.326l1.133-.528zm-1.921-7.669 7.187-6.454c.412-.37.976-.523 1.519-.412s1.002.472 1.236.975l4.353 9.335c.234.503.217 1.087-.047 1.574-.265.488-.744.821-1.293.899l-9.563 1.356z"/><path d="m21.669 5.963c.375-.175.822-.012.997.363.174.375.012.821-.363.996l-1.813.846c-.375.175-.822.012-.997-.363-.174-.375-.012-.822.363-.997z"/><path d="m22.223 12.015c.389.142.59.573.448.962-.141.389-.572.589-.961.448l-1.879-.684c-.389-.142-.59-.572-.448-.961.141-.389.572-.59.961-.449z"/><path d="m16.649 2.572c.142-.389.573-.59.962-.448.389.141.589.572.448.961l-.684 1.879c-.142.389-.572.59-.961.449-.389-.142-.59-.573-.449-.962z"/><path d="m11.594 18.076.435.933c.409.876.03 1.917-.846 2.326l-.907.422c-.875.409-1.917.03-2.325-.846l-.951-2.039.444-.207z"/></svg>
-              ${t.sharePrompt}
-            </p>
+            <p>${t.sharePrompt}</p>
             <social-share
               id="social-share-btn"
               style="display: block; min-height: 48px;"

@@ -122,7 +122,8 @@ export default {
         const cleanLang = (payload.l || 'en').trim().toLowerCase();
         const testUrl = `https://www.arealme.com/iq/${cleanLang || 'en'}/`;
 
-        const canonical = `${url.origin}/iq/cert/v/${token}`;
+        const certUrl = `${url.origin}/iq/cert/v/${token}`;
+        const canonical = 'https://www.arealme.com/iq/en/';
         const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -134,7 +135,7 @@ export default {
   <meta property="og:site_name" content="ARealMe Psychometrics">
   <meta property="og:title" content="${escapeHtml(pageTitle)}">
   <meta property="og:description" content="${escapeHtml(pageDesc)}">
-  <meta property="og:url" content="${escapeHtml(canonical)}">
+  <meta property="og:url" content="${escapeHtml(certUrl)}">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="${escapeHtml(pageTitle)}">
   <meta name="twitter:description" content="${escapeHtml(pageDesc)}">
@@ -142,7 +143,7 @@ export default {
 <body>
   <h1>${escapeHtml(pageTitle)}</h1>
   <p>${escapeHtml(pageDesc)}</p>
-  <p><a href="${escapeHtml(canonical)}">View Official Certificate Document</a></p>
+  <p><a href="${escapeHtml(certUrl)}">View Official Certificate Document</a></p>
   <p><a href="${escapeHtml(testUrl)}">Take the Official ARealMe IQ Test</a></p>
 </body>
 </html>`;

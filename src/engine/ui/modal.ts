@@ -412,7 +412,7 @@ export class CertificateModal {
         </div>
         <div class="arm-cert-body">
           <div class="arm-cert-input-wrap">
-            <div class="arm-cert-input-icon">📜</div>
+            <div class="arm-cert-input-icon"><svg width="28" height="28" viewBox="0 0 512 512" fill="#10B981"><path d="m106 512h300c24.814 0 45-20.186 45-45v-317h-105c-24.814 0-45-20.186-45-45v-105h-195c-24.814 0-45 20.186-45 45v422c0 24.814 20.186 45 45 45zm60-301h180c8.291 0 15 6.709 15 15s-6.709 15-15 15h-180c-8.291 0-15-6.709-15-15s6.709-15 15-15zm0 60h180c8.291 0 15 6.709 15 15s-6.709 15-15 15h-180c-8.291 0-15-6.709-15-15s6.709-15 15-15zm0 60h180c8.291 0 15 6.709 15 15s-6.709 15-15 15h-180c-8.291 0-15-6.709-15-15s6.709-15 15-15zm0 60h120c8.291 0 15 6.709 15 15s-6.709 15-15 15h-120c-8.291 0-15-6.709-15-15s6.709-15 15-15z"/><path d="m346 120h96.211l-111.211-111.211v96.211c0 8.276 6.724 15 15 15z"/></svg></div>
             <div class="arm-cert-input-title">${t.enterName}</div>
             <div class="arm-cert-input-desc">${t.nameRestrictionNotice}</div>
             <input type="text" class="arm-cert-input-field" id="arm-cert-name-input" maxlength="15" placeholder="${t.namePlaceholder}" autofocus>
@@ -510,7 +510,7 @@ export class CertificateModal {
             </div>
             <div class="arm-cert-actions">
               <button class="arm-cert-btn arm-cert-btn-download" id="arm-cert-download-btn">
-                <img src="https://areal.me/static/iq/assets/diskette.png" alt="" class="download-img" width="18" height="18" style="vertical-align: -0.15em;" />
+                <svg width="18" height="18" viewBox="0 0 32 32" fill="currentColor" style="vertical-align: -0.15em;"><path d="m30.71 7.29-6-6a1 1 0 0 0 -.71-.29h-2v8a2 2 0 0 1 -2 2h-8a2 2 0 0 1 -2-2v-8h-6a3 3 0 0 0 -3 3v24a3 3 0 0 0 3 3h2v-9a3 3 0 0 1 3-3h14a3 3 0 0 1 3 3v9h2a3 3 0 0 0 3-3v-20a1 1 0 0 0 -.29-.71z"/><path d="m12 1h8v8h-8z"/><path d="m23 21h-14a1 1 0 0 0 -1 1v9h16v-9a1 1 0 0 0 -1-1z"/></svg>
                 ${t.btnDownload}
               </button>
               <button class="arm-cert-btn arm-cert-btn-online" id="arm-cert-online-btn">
