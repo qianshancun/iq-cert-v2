@@ -1,6 +1,37 @@
+/**
+ * Royal — black & gold charter with the Cognitive Astrolabe.
+ * Left: engraved title lockup, bearer, glowing score, charter details.
+ * Right: a seven-axis astrolabe with an instrument bezel and stacked rim labels.
+ */
 import type { IQCertificatePayload } from '../../shared/types';
-import { drawRadarChart, drawText, formatDisplayRef, getArchetype, normalizeDimensions } from './common';
 import { drawQrOnCanvas } from '../qr';
+import {
+  CERT_HEIGHT,
+  CERT_WIDTH,
+  FONT,
+  drawDiamond,
+  drawRadarChart,
+  drawType,
+  font,
+  formatDisplayRef,
+  formatLongDate,
+  getArchetype,
+  hairline,
+  measureTracked,
+  normalizeDimensions,
+  vline,
+} from './common';
+
+const GOLD = '#D9B65C';
+const GOLD_LIGHT = '#F7E7B0';
+const GOLD_DEEP = '#8C6D2E';
+const GOLD_MUTED = '#A58A4D';
+const CREAM = '#F1E6CB';
+const CREAM_SOFT = 'rgba(241, 230, 203, 0.72)';
+const QR_DARK = '#15100A';
+
+const LX = 104;
+const LEFT_MAX = 616;
 
 export function renderRoyal(
   ctx: CanvasRenderingContext2D,
@@ -10,266 +41,260 @@ export function renderRoyal(
   const archetype = getArchetype(payload.s);
   const dimensions = normalizeDimensions(payload.m);
   const displayRef = formatDisplayRef(payload.id);
+  const name = payload.n.trim().toUpperCase();
 
-  // 1. Radial Background (1600 x 1000)
-  const grad = ctx.createRadialGradient(800, 500, 80, 800, 500, 950);
-  grad.addColorStop(0, '#241F18');
-  grad.addColorStop(1, '#080706');
-  ctx.fillStyle = grad;
-  ctx.fillRect(0, 0, 1600, 1000);
+  const astroX = 1150;
+  const astroY = 498;
+  const astroR = 200;
 
-  // 2. Gold Dust Particles
+  // ── Ground ──────────────────────────────────────────────────────────────
+  const ground = ctx.createRadialGradient(760, 460, 60, 800, 500, 1150);
+  ground.addColorStop(0, '#221B12');
+  ground.addColorStop(0.55, '#110E0B');
+  ground.addColorStop(1, '#060508');
+  ctx.fillStyle = ground;
+  ctx.fillRect(0, 0, CERT_WIDTH, CERT_HEIGHT);
+
   ctx.save();
-  for (let i = 0; i < 350; i++) {
-    const px = ((i * 12345 + 6789) % 1540) + 30;
-    const py = ((i * 54321 + 9876) % 940) + 30;
-    const sz = (i % 3) * 0.9 + 0.6;
-    const alpha = ((i % 5) + 2) * 0.12;
-    ctx.fillStyle = `rgba(234, 179, 8, ${alpha})`;
-    ctx.fillRect(px, py, sz, sz);
-  }
-  ctx.restore();
-
-  // 3. Royal Gold Borders
-  ctx.save();
-  ctx.lineWidth = 3;
-  ctx.strokeStyle = '#D4AF37';
-  ctx.strokeRect(24, 24, 1552, 952);
-
-  ctx.lineWidth = 1.5;
-  ctx.strokeStyle = '#856A28';
-  ctx.strokeRect(34, 34, 1532, 932);
-
-  // Corner Gold Knots
-  const corners = [
-    [34, 34],
-    [1566, 34],
-    [34, 966],
-    [1566, 966],
-  ];
-  ctx.strokeStyle = '#FACC15';
-  ctx.lineWidth = 2.5;
-  for (const [cx, cy] of corners) {
-    ctx.beginPath();
-    ctx.arc(cx, cy, 8, 0, Math.PI * 2);
-    ctx.stroke();
-  }
-  ctx.restore();
-
-  // 4. Header Titles
-  drawText(
-    ctx,
-    'AREALME HIGH INTELLECT COUNCIL · IMPERIAL CHARTER',
-    800,
-    75,
-    '700 16px "Cinzel", "Times New Roman", serif',
-    '#C5A059',
-    'center',
-    1200
-  );
-
-  drawText(
-    ctx,
-    'CONFERMENT OF SUPREME INTELLECTUAL DIGNITY',
-    800,
-    120,
-    '700 32px "Cinzel", "Times New Roman", serif',
-    '#F5E6BE',
-    'center',
-    1300
-  );
-
-  // Divider Line
-  ctx.strokeStyle = '#856A28';
-  ctx.lineWidth = 2;
   ctx.beginPath();
-  ctx.moveTo(480, 146);
-  ctx.lineTo(1120, 146);
-  ctx.stroke();
+  ctx.rect(40, 40, CERT_WIDTH - 80, CERT_HEIGHT - 80);
+  ctx.clip();
 
-  // 5. Left Column: Bearer Info & Score
-  const leftX = 90;
+  // Gold dust (deterministic)
+  let seed = 7;
+  const rand = () => {
+    seed = (seed * 1664525 + 1013904223) % 4294967296;
+    return seed / 4294967296;
+  };
+  for (let i = 0; i < 260; i++) {
+    const px = 40 + rand() * (CERT_WIDTH - 80);
+    const py = 40 + rand() * (CERT_HEIGHT - 80);
+    const size = 0.8 + rand() * 1.5;
+    const alpha = 0.05 + rand() * 0.32;
+    ctx.fillStyle = `rgba(233, 200, 110, ${alpha.toFixed(3)})`;
+    ctx.fillRect(px, py, size, size);
+  }
 
-  drawText(
-    ctx,
-    'ACCREDITED CANDIDATE',
-    leftX,
-    195,
-    '600 14px "Inter", sans-serif',
-    '#A1824A',
-    'left'
-  );
-
-  // Gold Shimmering Bearer Name
-  const nameGrad = ctx.createLinearGradient(leftX, 230, leftX + 500, 230);
-  nameGrad.addColorStop(0, '#FFF5D0');
-  nameGrad.addColorStop(0.5, '#EAB308');
-  nameGrad.addColorStop(1, '#CA8A04');
-
-  drawText(
-    ctx,
-    payload.n.toUpperCase(),
-    leftX,
-    250,
-    '800 48px "Cinzel", "Times New Roman", serif',
-    nameGrad as unknown as string,
-    'left',
-    560
-  );
-
-  // Conferred Title
-  const title = archetype.titleEn.toUpperCase();
-  drawText(
-    ctx,
-    `CONFERRED TITLE OF ROYAL DISTINCTION: ${title}`,
-    leftX,
-    305,
-    '700 16px "Inter", sans-serif',
-    '#E6CA85',
-    'left',
-    580
-  );
-
-  // Royal Score Box (ends at x = 570)
-  const scoreBoxW = 480;
-  const scoreBoxH = 470;
-  const scoreBoxY = 350;
-
-  ctx.fillStyle = 'rgba(25, 20, 12, 0.75)';
-  ctx.fillRect(leftX, scoreBoxY, scoreBoxW, scoreBoxH);
-  ctx.strokeStyle = '#C5A059';
-  ctx.lineWidth = 2;
-  ctx.strokeRect(leftX, scoreBoxY, scoreBoxW, scoreBoxH);
-
-  drawText(
-    ctx,
-    'OFFICIAL STANDARDIZED IQ RATING',
-    leftX + scoreBoxW / 2,
-    395,
-    '700 15px "Inter", sans-serif',
-    '#A1824A',
-    'center'
-  );
-
-  // Glowing IQ number
-  const scoreGrad = ctx.createLinearGradient(0, 430, 0, 560);
-  scoreGrad.addColorStop(0, '#FFFFFF');
-  scoreGrad.addColorStop(0.5, '#FDE047');
-  scoreGrad.addColorStop(1, '#CA8A04');
-
-  ctx.save();
-  ctx.shadowColor = 'rgba(234, 179, 8, 0.45)';
-  ctx.shadowBlur = 30;
-  drawText(
-    ctx,
-    String(payload.s),
-    leftX + scoreBoxW / 2,
-    500,
-    '900 130px "Cinzel", "Times New Roman", serif',
-    scoreGrad as unknown as string,
-    'center'
-  );
+  // Star-chart ambience around the astrolabe
+  ctx.lineWidth = 1;
+  [300, 356, 428].forEach((r, i) => {
+    ctx.strokeStyle = `rgba(217, 182, 92, ${(0.085 - i * 0.02).toFixed(3)})`;
+    ctx.beginPath();
+    ctx.arc(astroX, astroY, r, 0, Math.PI * 2);
+    ctx.stroke();
+  });
   ctx.restore();
 
-  drawText(
-    ctx,
-    `TIER: ${archetype.percentile.toUpperCase()} WORLDWIDE`,
-    leftX + scoreBoxW / 2,
-    605,
-    '800 17px "Inter", sans-serif',
-    '#FACC15',
-    'center'
-  );
+  // ── Frame ───────────────────────────────────────────────────────────────
+  ctx.save();
+  ctx.strokeStyle = GOLD_DEEP;
+  ctx.lineWidth = 2;
+  ctx.strokeRect(28, 28, CERT_WIDTH - 56, CERT_HEIGHT - 56);
+  ctx.strokeStyle = 'rgba(217, 182, 92, 0.85)';
+  ctx.lineWidth = 1;
+  ctx.strokeRect(38.5, 38.5, CERT_WIDTH - 77, CERT_HEIGHT - 77);
+  ctx.restore();
+  const corner = (x: number, y: number, sx: 1 | -1, sy: 1 | -1) => {
+    drawDiamond(ctx, x, y, 6, GOLD);
+    ctx.save();
+    ctx.strokeStyle = GOLD;
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(x + sx * 8, y + sy * 8);
+    ctx.lineTo(x + sx * 30, y + sy * 30);
+    ctx.stroke();
+    ctx.restore();
+    drawDiamond(ctx, x + sx * 34, y + sy * 34, 2.5, GOLD);
+  };
+  corner(38.5, 38.5, 1, 1);
+  corner(CERT_WIDTH - 38.5, 38.5, -1, 1);
+  corner(38.5, CERT_HEIGHT - 38.5, 1, -1);
+  corner(CERT_WIDTH - 38.5, CERT_HEIGHT - 38.5, -1, -1);
 
-  // 2-line clean reference inside score box
-  drawText(
-    ctx,
-    `REF: ARM-ROYAL-${displayRef}`,
-    leftX + scoreBoxW / 2,
-    720,
-    '600 13px "Inter", monospace',
-    '#856A28',
-    'center',
-    440
-  );
+  // ── Title lockup ────────────────────────────────────────────────────────
+  drawType(ctx, 'AREALME · HIGH INTELLECT COUNCIL', LX, 104, {
+    font: font(500, 14, FONT.roman),
+    color: GOLD_MUTED,
+    tracking: 0.34,
+  });
+  const titleGrad = ctx.createLinearGradient(0, 128, 0, 178);
+  titleGrad.addColorStop(0, '#FFF4CC');
+  titleGrad.addColorStop(0.55, '#E6C56E');
+  titleGrad.addColorStop(1, '#B8933F');
+  drawType(ctx, 'ROYAL CHARTER', LX, 176, {
+    font: font(700, 54, FONT.roman),
+    color: titleGrad,
+    tracking: 0.12,
+    maxWidth: LEFT_MAX,
+  });
+  drawType(ctx, 'OF INTELLECTUAL DISTINCTION', LX, 216, {
+    font: font(400, 17, FONT.roman),
+    color: CREAM_SOFT,
+    tracking: 0.38,
+  });
+  hairline(ctx, LX, 249, LX + 72, GOLD, 2);
 
-  drawText(
-    ctx,
-    `ISSUED: ${payload.d}`,
-    leftX + scoreBoxW / 2,
-    750,
-    '500 13px "Inter", monospace',
-    '#856A28',
-    'center',
-    440
-  );
-
-  // 6. Center-Right Column: 7-Axis Heptagonal Radar Chart (Cognitive Astrolabe)
-  // Center is at 1000, 560 with radius 175.
-  // Leftmost label extends to 1000 - (175+26) - 150 = 649, which is 79px to the right of scoreBox (ends at 570)!
-  const radarCenterX = 1000;
-  const radarCenterY = 560;
-  const radarRadius = 175;
-
-  drawRadarChart(ctx, radarCenterX, radarCenterY, radarRadius, dimensions, 'en', {
-    gridColor: 'rgba(212, 175, 55, 0.25)',
-    axisColor: 'rgba(212, 175, 55, 0.35)',
-    fillColor: 'rgba(234, 179, 8, 0.22)',
-    strokeColor: '#FACC15',
-    labelColor: '#E6CA85',
-    valueColor: '#FFFFFF',
+  // ── Bearer ──────────────────────────────────────────────────────────────
+  drawType(ctx, 'Conferred upon', LX, 310, {
+    font: font(500, 28, FONT.serif, true),
+    color: CREAM,
+  });
+  const nameGrad = ctx.createLinearGradient(LX, 0, LX + 600, 0);
+  nameGrad.addColorStop(0, '#FFF3C4');
+  nameGrad.addColorStop(0.5, '#E4C270');
+  nameGrad.addColorStop(1, '#C49C48');
+  drawType(ctx, name, LX, 372, {
+    font: font(700, 62, FONT.roman),
+    color: nameGrad,
+    tracking: 0.08,
+    maxWidth: LEFT_MAX,
+    minSize: 34,
+  });
+  drawType(ctx, archetype.titleEn.toUpperCase(), LX, 420, {
+    font: font(500, 18, FONT.roman),
+    color: GOLD,
+    tracking: 0.3,
+    maxWidth: LEFT_MAX,
   });
 
-  drawText(
-    ctx,
-    '7-DIMENSIONAL COGNITIVE ASTROLABE',
-    radarCenterX,
-    270,
-    '700 17px "Cinzel", "Inter", sans-serif',
-    '#C5A059',
-    'center'
-  );
+  // ── Score ───────────────────────────────────────────────────────────────
+  drawType(ctx, 'FULL SCALE IQ', LX, 504, {
+    font: font(400, 14, FONT.roman),
+    color: GOLD_MUTED,
+    tracking: 0.34,
+  });
+  const scoreFont = font(700, 190, FONT.roman);
+  const scoreGrad = ctx.createLinearGradient(0, 514, 0, 666);
+  scoreGrad.addColorStop(0, '#FFFBEA');
+  scoreGrad.addColorStop(0.55, '#F3D77C');
+  scoreGrad.addColorStop(1, '#C9A24A');
+  ctx.save();
+  ctx.shadowColor = 'rgba(243, 215, 124, 0.45)';
+  ctx.shadowBlur = 34;
+  const scoreRun = drawType(ctx, String(payload.s), LX - 4, 666, {
+    font: scoreFont,
+    color: scoreGrad,
+    tracking: 0.02,
+  });
+  ctx.restore();
 
-  // 7. QR Code in bottom right
-  const qrX = 1350;
-  const qrY = 640;
+  const tierX = LX + scoreRun.width + 46;
+  vline(ctx, tierX - 22, 574, 654, 'rgba(217, 182, 92, 0.45)');
+  drawType(ctx, archetype.percentile.toUpperCase(), tierX, 612, {
+    font: font(600, 32, FONT.roman),
+    color: GOLD_LIGHT,
+  });
+  drawType(ctx, 'WORLDWIDE', tierX, 642, {
+    font: font(400, 13, FONT.roman),
+    color: GOLD_MUTED,
+    tracking: 0.34,
+  });
+
+  // ── Charter details ─────────────────────────────────────────────────────
+  hairline(ctx, LX, 716.5, LX + 560, 'rgba(140, 109, 46, 0.7)');
+  drawType(ctx, 'ISSUED', LX, 754, {
+    font: font(400, 12, FONT.roman),
+    color: GOLD_MUTED,
+    tracking: 0.3,
+  });
+  drawType(ctx, formatLongDate(payload.d), LX, 784, {
+    font: font(500, 22, FONT.serif),
+    color: CREAM,
+  });
+  drawType(ctx, 'CHARTER NO.', LX + 290, 754, {
+    font: font(400, 12, FONT.roman),
+    color: GOLD_MUTED,
+    tracking: 0.3,
+  });
+  drawType(ctx, `ARM-${displayRef}`, LX + 290, 783, {
+    font: font(500, 15, FONT.mono),
+    color: CREAM,
+    maxWidth: 300,
+  });
+
+  // ── Registrar ───────────────────────────────────────────────────────────
+  drawType(ctx, 'ARealMe Psychometrics Division', LX, 858, {
+    font: font(600, 27, FONT.serif, true),
+    color: CREAM,
+  });
+  hairline(ctx, LX, 868.5, LX + 400, 'rgba(217, 182, 92, 0.6)');
+  drawType(ctx, 'REGISTRAR · DIGITALLY SIGNED', LX, 892, {
+    font: font(400, 11, FONT.roman),
+    color: GOLD_MUTED,
+    tracking: 0.3,
+  });
+
+  // ── Astrolabe ───────────────────────────────────────────────────────────
+  const captionFont = font(500, 14, FONT.roman);
+  const caption = 'COGNITIVE ASTROLABE';
+  const captionW = measureTracked(ctx, caption, captionFont, 0.34);
+  drawType(ctx, caption, astroX, 152, {
+    font: captionFont,
+    color: GOLD_MUTED,
+    align: 'center',
+    tracking: 0.34,
+  });
+  drawDiamond(ctx, astroX - captionW / 2 - 22, 147, 3, GOLD_MUTED);
+  drawDiamond(ctx, astroX + captionW / 2 + 22, 147, 3, GOLD_MUTED);
+
+  drawRadarChart(ctx, astroX, astroY, astroR, dimensions, 'en', {
+    gridColor: 'rgba(217, 182, 92, 0.18)',
+    outerGridColor: 'rgba(217, 182, 92, 0.5)',
+    axisColor: 'rgba(217, 182, 92, 0.22)',
+    fillColor: 'rgba(243, 215, 124, 0.2)',
+    fillGradient: ['rgba(243, 215, 124, 0.42)', 'rgba(217, 182, 92, 0.08)'],
+    strokeColor: '#F3D77C',
+    glowColor: 'rgba(243, 215, 124, 0.55)',
+    glowBlur: 18,
+    lineWidth: 2.5,
+    dotRadius: 5,
+    dotCoreColor: '#1A150C',
+    labelColor: GOLD_MUTED,
+    valueColor: GOLD_LIGHT,
+    labelStyle: 'stacked',
+    shortLabels: true,
+    labelOffset: 66,
+    labelFont: font(400, 11, FONT.roman),
+    valueFont: font(600, 21, FONT.roman),
+    labelTracking: 0.22,
+    rings: 5,
+    bezel: { color: 'rgba(217, 182, 92, 0.45)', majorColor: GOLD, radiusOffset: 34, ticks: 84 },
+    centerDot: GOLD,
+  });
+
+  // ── QR ──────────────────────────────────────────────────────────────────
   const qrSize = 160;
-
+  const qrX = CERT_WIDTH - 88 - qrSize;
+  const qrY = CERT_HEIGHT - 64 - qrSize;
   drawQrOnCanvas(ctx, verifyUrl, qrX, qrY, qrSize, {
-    darkColor: '#000000',
-    lightColor: '#F5E6BE',
+    darkColor: QR_DARK,
+    lightColor: CREAM,
     margin: 2,
-    borderRadius: 8,
+    borderRadius: 4,
+  });
+  drawType(ctx, 'SCAN TO VERIFY', qrX - 26, qrY + 60, {
+    font: font(500, 12, FONT.roman),
+    color: GOLD,
+    align: 'right',
+    tracking: 0.3,
+  });
+  drawType(ctx, 'arealme.com/iq/cert', qrX - 26, qrY + 86, {
+    font: font(400, 13, FONT.mono),
+    color: GOLD_MUTED,
+    align: 'right',
+  });
+  drawType(ctx, 'Signed & tamper-evident', qrX - 26, qrY + 110, {
+    font: font(500, 15, FONT.serif, true),
+    color: GOLD_MUTED,
+    align: 'right',
   });
 
-  drawText(
+  // ── Footnote ────────────────────────────────────────────────────────────
+  drawType(
     ctx,
-    'SCAN TO VERIFY',
-    qrX + qrSize / 2,
-    qrY + qrSize + 22,
-    '700 13px "Inter", sans-serif',
-    '#E6CA85',
-    'center'
-  );
-
-  drawText(
-    ctx,
-    'arealme.com',
-    qrX + qrSize / 2,
-    qrY + qrSize + 42,
-    '500 12px "Inter", monospace',
-    '#856A28',
-    'center'
-  );
-
-  // Bottom seal / footnote
-  drawText(
-    ctx,
-    'Accredited by ARealMe Psychometrics Division · Cryptographically Secured',
-    800,
-    940,
-    '13px "Inter", sans-serif',
-    '#856A28',
-    'center'
+    'Accredited by the ARealMe Psychometrics Division · Cryptographically sealed and verifiable',
+    LX,
+    938,
+    { font: font(500, 16, FONT.serif, true), color: GOLD_MUTED, maxWidth: 800 }
   );
 }

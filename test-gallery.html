@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IQ Certificate Gallery · design QA</title>
+  <style>
+    body { margin: 0; background: #14161B; color: #C9CDD4; font: 13px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; padding: 24px; }
+    h1 { font-size: 15px; font-weight: 600; margin: 0 0 4px; color: #FFF; }
+    p { margin: 0 0 20px; color: #8B929D; }
+    .case { margin-bottom: 40px; }
+    .case h2 { font-size: 13px; font-weight: 600; color: #E5E7EB; margin: 0 0 10px; font-family: ui-monospace, Menlo, monospace; }
+    .row { display: grid; grid-template-columns: repeat(auto-fit, minmax(480px, 1fr)); gap: 16px; }
+    .row.single { grid-template-columns: 1fr; }
+    figure { margin: 0; }
+    figcaption { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: #6B7280; margin-bottom: 6px; }
+    canvas { width: 100%; height: auto; display: block; border-radius: 4px; box-shadow: 0 8px 24px rgba(0,0,0,.45); background: #000; }
+    code { color: #10B981; }
+  </style>
+  <script src="/dist/iq-cert.js"></script>
+</head>
+<body>
+  <h1>Certificate design gallery</h1>
+  <p>Every design × edge-case payload, rendered through <code>ArealmeCert.render()</code>. Filter with <code>?case=N</code> and/or <code>?design=academic|swiss|royal</code>.</p>
+  <div id="root"></div>
+  <script>
+    const CASES = [
+      { label: 'Reference · BILL LTL · 141', name: 'BILL LTL', score: 141, date: '2026.09.20', attemptId: 'ATTEMPT-2026-0920-BILL', dimensions: [79, 82, 69, 93, 57, 99, 99], lang: 'cn' },
+      { label: 'Diacritics · 15 chars · 100 · UUID id', name: 'Éloïse Ñuñez Øy', score: 100, date: '2026.01.05', attemptId: 'feedff53-5b67-4c1a-9d0e-0a1b2c3d4e5f', dimensions: [35, 48, 22, 61, 40, 55, 30], lang: 'es' },
+      { label: 'Short name · 160 · all 100', name: 'AL', score: 160, date: '2026.12.31', attemptId: 'x9k2', dimensions: [100, 100, 100, 100, 100, 100, 100], lang: 'en' },
+      { label: 'Widest name · 129 · low dims', name: 'MMMMMMMMMMMMMMM', score: 129, date: '2025.07.04', attemptId: 'ATTEMPT-2025-0704-WIDE', dimensions: [12, 8, 15, 20, 5, 10, 18], lang: 'ja' },
+      { label: 'Lowest eligible · 80 · JOHN RIVER', name: 'john river', score: 80, date: '2026.09.22', attemptId: 'ATTEMPT-2026-0922-JR', dimensions: [44, 51, 38, 47, 62, 40, 55], lang: 'pt' },
+    ];
+    const DESIGNS = ['academic', 'swiss', 'royal'];
+    const params = new URLSearchParams(location.search);
+    const onlyCase = params.get('case');
+    const onlyDesign = params.get('design');
+    // ?crop=x,y,w,h[;x,y,w,h…] — magnified inspection crops in artwork coordinates (1600 × 1000)
+    const crops = params.get('crop')
+      ? params.get('crop').split(';').map((c) => c.split(',').map(Number)).filter((c) => c.length === 4)
+      : [];
+    const root = document.getElementById('root');
+
+    (async () => {
+      await window.ArealmeCert.fontsReady;
+      for (let i = 0; i < CASES.length; i++) {
+        if (onlyCase !== null && String(i) !== onlyCase) continue;
+        const c = CASES[i];
+        const section = document.createElement('section');
+        section.className = 'case';
+        section.innerHTML = `<h2>#${i} · ${c.label}</h2>`;
+        const row = document.createElement('div');
+        row.className = 'row' + (onlyDesign ? ' single' : '');
+        section.appendChild(row);
+        root.appendChild(section);
+        for (const design of DESIGNS) {
+          if (onlyDesign && onlyDesign !== design) continue;
+          const fig = document.createElement('figure');
+          fig.innerHTML = `<figcaption>${design}</figcaption>`;
+          const canvas = document.createElement('canvas');
+          canvas.width = 1600;
+          canvas.height = 1000;
+          canvas.id = `c${i}-${design}`;
+          fig.appendChild(canvas);
+          row.appendChild(fig);
+          await window.ArealmeCert.render(canvas, design, { ...c, verifyBaseUrl: '/iq/cert/v' });
+          if (crops.length) canvas.style.display = 'none';
+          for (const [cx, cy, cw, ch] of crops) {
+            const mag = document.createElement('canvas');
+            const outW = 1560;
+            const outH = Math.round((outW * ch) / cw);
+            mag.width = outW;
+            mag.height = outH;
+            mag.style.width = '780px';
+            mag.style.height = (outH / 2) + 'px';
+            const mctx = mag.getContext('2d');
+            mctx.imageSmoothingEnabled = true;
+            mctx.imageSmoothingQuality = 'high';
+            mctx.drawImage(canvas, cx, cy, cw, ch, 0, 0, outW, outH);
+            const cap = document.createElement('figcaption');
+            cap.textContent = `crop ${cx},${cy} ${cw}×${ch}`;
+            fig.appendChild(cap);
+            fig.appendChild(mag);
+          }
+        }
+      }
+      document.title = 'gallery-ready';
+    })();
+  </script>
+</body>
+</html>

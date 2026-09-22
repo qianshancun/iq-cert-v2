@@ -2,10 +2,9 @@ import { extractTokenFromLocation } from '../shared/constants';
 import { getDimensionsI18n, getVerifyI18n, normalizeLang } from '../shared/i18n';
 import { decodeCertificateToken } from '../shared/token';
 import type { IQCertDesign, IQCertificatePayload } from '../shared/types';
+import { ensureCertFonts } from '../engine/fonts';
+import { renderCertificate, renderCertificateToDataUrl } from '../engine/renderers';
 import { drawRadarChart, formatDisplayRef, getArchetype, normalizeDimensions } from '../engine/renderers/common';
-import { renderAcademic } from '../engine/renderers/academic';
-import { renderRoyal } from '../engine/renderers/royal';
-import { renderSwiss } from '../engine/renderers/swiss';
 
 function getBacktrackUrl(lang?: string): string {
   const clean = normalizeLang(lang);
@@ -226,7 +225,9 @@ class VerificationApp {
       if (!this.certCanvas) return;
       const a = document.createElement('a');
       a.download = `AREALME-IQ-Certificate-${this.payload.s}-${this.payload.n.replace(/\s+/g, '_')}.png`;
-      a.href = this.certCanvas.toDataURL('image/png');
+      a.href =
+        renderCertificateToDataUrl(this.selectedDesign, this.payload, window.location.href, 2) ||
+        this.certCanvas.toDataURL('image/png');
       a.click();
     });
   }
@@ -254,23 +255,18 @@ class VerificationApp {
     this.certCanvas = document.getElementById('view-cert-canvas') as HTMLCanvasElement | null;
     if (this.certCanvas) {
       this.certCtx = this.certCanvas.getContext('2d');
-      this.drawCertificate();
+      // Draw once the certificate typefaces are in memory (bounded by the font timeout),
+      // and again if any face arrives late.
+      void ensureCertFonts(this.payload.n).then(() => this.drawCertificate());
+      try {
+        document.fonts?.addEventListener('loadingdone', () => this.drawCertificate());
+      } catch (_e) {}
     }
   }
 
   private drawCertificate(): void {
     if (!this.certCtx) return;
-    this.certCtx.clearRect(0, 0, 1600, 1000);
-
-    const verifyUrl = window.location.href;
-
-    if (this.selectedDesign === 'swiss') {
-      renderSwiss(this.certCtx, this.payload, verifyUrl);
-    } else if (this.selectedDesign === 'royal') {
-      renderRoyal(this.certCtx, this.payload, verifyUrl);
-    } else {
-      renderAcademic(this.certCtx, this.payload, verifyUrl);
-    }
+    renderCertificate(this.certCtx, this.selectedDesign, this.payload, window.location.href);
   }
 }
 

@@ -1,6 +1,6 @@
 {
   "name": "iq-cert-v2",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "Next-generation ARealMe IQ Certificate Engine, Verification Portal, and Cloudflare Worker",
   "main": "dist/iq-cert.js",
   "type": "module",
@@ -28,5 +28,6 @@
     "canvas",
     "sharekit"
   ],
-  "license": "MIT"
+  "license": "MIT",
+  "packageManager": "pnpm@8.15.5+sha1.a58c038faac410c947dbdb93eb30994037d0fce2"
 }

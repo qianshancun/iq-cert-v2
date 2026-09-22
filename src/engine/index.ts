@@ -1,5 +1,13 @@
-import type { IQCertificateStartData } from '../shared/types';
+import type { IQCertDesign, IQCertificatePayload, IQCertificateStartData } from '../shared/types';
+import { ensureCertFonts, injectCertFontStylesheet } from './fonts';
+import { buildCertificatePayload } from './payload';
+import { CERT_HEIGHT, CERT_WIDTH, renderCertificate } from './renderers';
 import { CertificateModal } from './ui/modal';
+
+export interface ArealmeCertRenderResult {
+  payload: IQCertificatePayload;
+  verifyUrl: string;
+}
 
 // Declare global types
 declare global {
@@ -9,51 +17,55 @@ declare global {
     };
     ArealmeCert?: {
       version: string;
+      /** Open the certificate dialog (name entry → preview → download / verify). */
       start: (data: IQCertificateStartData, options?: Record<string, unknown>) => void;
+      /**
+       * Draw a certificate directly into a canvas without any UI (host-side capture, previews, QA).
+       * The canvas keeps its own size; the 1600 × 1000 artwork is scaled to fit it.
+       */
+      render: (
+        canvas: HTMLCanvasElement,
+        design: IQCertDesign,
+        data: IQCertificateStartData & { name: string }
+      ) => Promise<ArealmeCertRenderResult>;
+      /** Resolves once the certificate typefaces are available (or the load timed out). */
+      fontsReady: Promise<boolean>;
       modalInstance?: CertificateModal;
     };
   }
 }
 
-/**
- * Preloads Google Fonts for Certificate Canvas typography
- */
-function preloadFonts(): void {
-  if (document.getElementById('arealme-cert-fonts')) return;
-  const link = document.createElement('link');
-  link.id = 'arealme-cert-fonts';
-  link.rel = 'stylesheet';
-  link.href =
-    'https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;800;900&family=Inter:wght@400;600;700;800;900&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap';
-  document.head.appendChild(link);
-}
-
 // Initialize ArealmeCert global
 export function initEngine(): void {
-  preloadFonts();
+  injectCertFontStylesheet();
+  const fontsReady = ensureCertFonts();
 
   window.ArealmeCert = {
-    version: '2.0.0',
+    version: '2.1.0',
+    fontsReady,
     start(data: IQCertificateStartData, _options?: Record<string, unknown>) {
       const modal = new CertificateModal(data);
       window.ArealmeCert!.modalInstance = modal;
       void modal.open();
     },
+    async render(canvas, design, data) {
+      const name = (data.name || data.lockedName || '').trim() || 'CANDIDATE';
+      const built = await buildCertificatePayload(data, name);
+      await ensureCertFonts(built.payload.n);
+      const ctx = canvas.getContext('2d');
+      if (!ctx) throw new Error('ArealmeCert.render: 2D context unavailable');
+      ctx.setTransform(canvas.width / CERT_WIDTH, 0, 0, canvas.height / CERT_HEIGHT, 0, 0);
+      renderCertificate(ctx, design, built.payload, built.verifyUrl);
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      return { payload: built.payload, verifyUrl: built.verifyUrl };
+    },
   };
 
-  // Trigger onReady callback if host app is waiting
+  // Trigger onReady callback once the typefaces are in (never blocks for more than the font timeout)
   if (typeof document !== 'undefined') {
-    if (document.fonts && document.fonts.ready) {
-      document.fonts.ready.then(() => {
-        window.ArealmeCertConfig?.onReady?.();
-      }).catch(() => {
-        window.ArealmeCertConfig?.onReady?.();
-      });
-    } else {
-      setTimeout(() => {
-        window.ArealmeCertConfig?.onReady?.();
-      }, 100);
-    }
+    fontsReady
+      .then(() => window.ArealmeCertConfig?.onReady?.())
+      .catch(() => window.ArealmeCertConfig?.onReady?.());
   }
 }
 

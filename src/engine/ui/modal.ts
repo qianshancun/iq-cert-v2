@@ -1,12 +1,10 @@
-import { BLACKLIST, DEFAULT_VERIFY_BASE_URL } from '../../shared/constants';
-import { buildVerifyUrl } from '../../shared/constants';
+import { BLACKLIST } from '../../shared/constants';
 import { getModalI18n, type ModalTranslations } from '../../shared/i18n';
-import { encodeCertificateToken } from '../../shared/token';
 import type { IQCertDesign, IQCertificatePayload, IQCertificateStartData } from '../../shared/types';
-import { renderAcademic } from '../renderers/academic';
+import { ensureCertFonts } from '../fonts';
+import { buildCertificatePayload } from '../payload';
+import { CERT_HEIGHT, CERT_WIDTH, renderCertificate, renderCertificateToDataUrl } from '../renderers';
 import { formatDisplayRef } from '../renderers/common';
-import { renderRoyal } from '../renderers/royal';
-import { renderSwiss } from '../renderers/swiss';
 
 const MODAL_ID = 'arealme-cert-modal-v2';
 
@@ -19,6 +17,7 @@ export class CertificateModal {
   private payload: IQCertificatePayload | null = null;
   private verifyUrl: string = '';
   private i18n: ModalTranslations;
+  private fontsListener: (() => void) | null = null;
 
   constructor(data: IQCertificateStartData) {
     this.data = data;
@@ -340,46 +339,17 @@ export class CertificateModal {
   }
 
   private async initPayload(name: string): Promise<void> {
-    const score = Number(this.data.score) || 100;
-    const date = this.data.date || new Date().toISOString().slice(0, 10).replace(/-/g, '.');
-    const attemptId = this.data.attemptId || Math.random().toString(36).slice(2, 10);
-    const recordedLang = (this.data.lang || 'en').trim();
+    const built = await buildCertificatePayload(this.data, name);
+    this.payload = built.payload;
+    this.verifyUrl = built.verifyUrl;
 
-    let rawDimensions = this.data.dimensions;
-    let norm: number[];
-    if (Array.isArray(rawDimensions) && rawDimensions.length === 7 && typeof rawDimensions[0] === 'number') {
-      norm = rawDimensions as number[];
-    } else if (Array.isArray(rawDimensions)) {
-      norm = (rawDimensions as Array<{ percent?: number }>).map((d) => d.percent ?? 75);
-    } else {
-      norm = [80, 82, 75, 88, 70, 85, 90];
-    }
+    // Lock name into storage (one attempt → one bearer, for life)
+    try {
+      localStorage.setItem(`arealme:iq:cert:name:${built.payload.id}`, built.payload.n);
+    } catch (_e) {}
 
-    const basePayload: Omit<IQCertificatePayload, 'sig'> = {
-      id: attemptId,
-      n: name.trim(),
-      s: score,
-      d: date,
-      m: norm,
-      l: recordedLang,
-      v: 3,
-    };
-
-    const token = await encodeCertificateToken(basePayload);
-    const baseUrl = this.data.verifyBaseUrl || DEFAULT_VERIFY_BASE_URL;
-    this.verifyUrl = buildVerifyUrl(token, baseUrl);
-
-    this.payload = {
-      ...basePayload,
-      sig: token.slice(-8),
-    };
-
-    // Lock name into storage
-    if (attemptId) {
-      try {
-        localStorage.setItem(`arealme:iq:cert:name:${attemptId}`, name.trim());
-      } catch (_e) {}
-    }
+    // Certificate typefaces must be in memory before the first draw; bounded by the font timeout.
+    await ensureCertFonts(built.payload.n);
   }
 
   /** Render Score < 80 restriction screen (Rule 4) */
@@ -537,7 +507,7 @@ export class CertificateModal {
               <button class="arm-cert-tab" data-design="royal">${t.tabRoyal}</button>
             </div>
             <div class="arm-cert-canvas-container" id="ac-wrapper">
-              <canvas id="arm-cert-canvas" width="1600" height="1000"></canvas>
+              <canvas id="arm-cert-canvas" width="${CERT_WIDTH}" height="${CERT_HEIGHT}"></canvas>
             </div>
             <div class="arm-cert-actions">
               <button class="arm-cert-btn arm-cert-btn-download" id="arm-cert-download-btn">
@@ -583,19 +553,24 @@ export class CertificateModal {
     overlay.querySelector('#arm-cert-cancel-btn')?.addEventListener('click', () => this.close());
 
     this.drawCurrent();
+    this.watchFonts();
+  }
+
+  /** Redraw once if any typeface arrives after the first paint. */
+  private watchFonts(): void {
+    if (typeof document === 'undefined' || !document.fonts || this.fontsListener) return;
+    const handler = () => this.drawCurrent();
+    this.fontsListener = handler;
+    try {
+      document.fonts.addEventListener('loadingdone', handler);
+    } catch (_e) {
+      this.fontsListener = null;
+    }
   }
 
   private drawCurrent(): void {
     if (!this.ctx || !this.payload) return;
-    this.ctx.clearRect(0, 0, 1600, 1000);
-
-    if (this.currentDesign === 'swiss') {
-      renderSwiss(this.ctx, this.payload, this.verifyUrl);
-    } else if (this.currentDesign === 'royal') {
-      renderRoyal(this.ctx, this.payload, this.verifyUrl);
-    } else {
-      renderAcademic(this.ctx, this.payload, this.verifyUrl);
-    }
+    renderCertificate(this.ctx, this.currentDesign, this.payload, this.verifyUrl);
 
     // Dispatch event for host page capture
     window.dispatchEvent(
@@ -613,11 +588,20 @@ export class CertificateModal {
     if (!this.canvas || !this.payload) return;
     const a = document.createElement('a');
     a.download = `AREALME-IQ-Certificate-${this.payload.s}-${this.payload.n.replace(/\s+/g, '_')}.png`;
-    a.href = this.canvas.toDataURL('image/png');
+    // 2× export (3200 × 2000) for print-quality downloads; fall back to the on-screen bitmap.
+    a.href =
+      renderCertificateToDataUrl(this.currentDesign, this.payload, this.verifyUrl, 2) ||
+      this.canvas.toDataURL('image/png');
     a.click();
   }
 
   public close(): void {
+    if (this.fontsListener && typeof document !== 'undefined' && document.fonts) {
+      try {
+        document.fonts.removeEventListener('loadingdone', this.fontsListener);
+      } catch (_e) {}
+      this.fontsListener = null;
+    }
     if (this.container) {
       this.container.classList.remove('active');
       setTimeout(() => this.container?.remove(), 250);

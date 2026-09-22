@@ -48,7 +48,7 @@ function toAssetPath(pathname: string): string {
     assetPath === '/cert/iq' ||
     assetPath === '/cert/iq/'
   ) {
-    return '/index.html';
+    return '/';
   }
 
   if (assetPath.startsWith('/iq/cert/')) {
@@ -57,11 +57,11 @@ function toAssetPath(pathname: string): string {
     assetPath = assetPath.slice('/cert/iq'.length);
   }
 
-  // Path-token routes are SPA pages — always serve index.html
+  // Path-token routes are SPA pages — always serve root index.html
   if (/^\/(?:v|verify)(?:\/|$)/.test(assetPath)) {
-    return '/index.html';
+    return '/';
   }
-  return assetPath || '/index.html';
+  return assetPath || '/';
 }
 
 export default {
@@ -160,6 +160,17 @@ export default {
     // 6. Forward human requests to static assets
     const assetUrl = new URL(request.url);
     assetUrl.pathname = toAssetPath(path);
-    return env.ASSETS.fetch(new Request(assetUrl, request));
+    let assetResponse = await env.ASSETS.fetch(new Request(assetUrl, request));
+
+    // Prevent Cloudflare Assets from redirecting SPA / index requests out to arealme.com root
+    if (assetResponse.status >= 300 && assetResponse.status < 400) {
+      const loc = assetResponse.headers.get('location');
+      if (loc === '/' || loc === assetUrl.origin + '/') {
+        assetUrl.pathname = '/';
+        assetResponse = await env.ASSETS.fetch(new Request(assetUrl, request));
+      }
+    }
+
+    return assetResponse;
   },
 };
