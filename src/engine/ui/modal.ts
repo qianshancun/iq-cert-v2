@@ -1,4 +1,4 @@
-import { BLACKLIST } from '../../shared/constants';
+import { isSensitiveName } from '../../shared/constants';
 import { getModalI18n, type ModalTranslations } from '../../shared/i18n';
 import type { IQCertDesign, IQCertificatePayload, IQCertificateStartData } from '../../shared/types';
 import { ensureCertFonts } from '../fonts';
@@ -454,19 +454,18 @@ export class CertificateModal {
         return;
       }
 
-      // Blacklist filter
-      const upper = val.toUpperCase().replace(/[^A-Z]/g, '');
-      if (BLACKLIST.some((b) => upper.includes(b))) {
-        input.classList.add('error');
-        errorMsg.textContent = t.blacklisted;
-        errorMsg.style.display = 'block';
-        return;
+      // Sensitive word filter with Shadowban:
+      // If user enters sensitive political, religious, or abusive keywords,
+      // silently replace the name with 'User' without alerting the user.
+      let finalName = val;
+      if (isSensitiveName(val)) {
+        finalName = 'User';
       }
 
       btnSubmit.disabled = true;
       btnSubmit.textContent = t.generating;
 
-      await this.initPayload(val);
+      await this.initPayload(finalName);
       this.renderPreviewView();
     };
 

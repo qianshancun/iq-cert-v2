@@ -88,8 +88,9 @@ export default {
     }
 
     // 3. Serve runtime engine with CORS
-    if (path.endsWith('/iq-cert.js') || path.endsWith('/iq-cert.v2.js')) {
-      const assetResponse = await env.ASSETS.fetch(new Request(new URL('/iq-cert.js', url.origin)));
+    if (path.includes('iq-cert') && path.endsWith('.js')) {
+      const targetJs = path.endsWith('/iq-cert.js') || path.endsWith('/iq-cert.v2.js') ? '/iq-cert.js' : toAssetPath(path);
+      const assetResponse = await env.ASSETS.fetch(new Request(new URL(targetJs, url.origin)));
       if (assetResponse.status === 200) {
         const headers = new Headers(assetResponse.headers);
         headers.set('Access-Control-Allow-Origin', '*');

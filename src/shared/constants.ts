@@ -119,6 +119,14 @@ export const ARCHETYPES: IQArchetype[] = [
   },
 ];
 
+export {
+  COMPACT_BLACKLIST,
+  WORD_BLACKLIST,
+  isSensitiveName,
+  normalizeInputName,
+} from './sensitive';
+
+/** Legacy array export maintained for backward compatibility. */
 export const BLACKLIST = [
   'KKK',
   'ASS',
@@ -131,7 +139,6 @@ export const BLACKLIST = [
   'WAP',
   'WTF',
   'JAP',
-  'CHI',
   'SB',
   'FUCK',
   'SHIT',
