@@ -1,15 +1,11 @@
 :root {
+  /* Neutral chrome */
   --bg-dark: #0A0C10;
-  --bg-grad-1: rgba(16, 185, 129, 0.12);
-  --bg-grad-2: rgba(245, 158, 11, 0.08);
   --card-bg: rgba(18, 22, 30, 0.75);
   --card-border: rgba(255, 255, 255, 0.08);
   --text-main: #F3F4F6;
   --text-muted: #9CA3AF;
   --heading-color: #FFFFFF;
-  --primary: #10B981;
-  --primary-hover: #34D399;
-  --gold: #F59E0B;
   --navy: #1D2D44;
   --dim-item-bg: rgba(255, 255, 255, 0.03);
   --dim-track-bg: rgba(255, 255, 255, 0.08);
@@ -20,20 +16,28 @@
   --shadow-color: rgba(0, 0, 0, 0.6);
   --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
   --font-serif: "Cinzel", "Times New Roman", serif;
+
+  /* Score atmosphere — default emerald (≤99 / unset). Overridden by [data-tier]. */
+  --primary: #10B981;
+  --primary-hover: #34D399;
+  --primary-deep: #059669;
+  --primary-soft: rgba(16, 185, 129, 0.12);
+  --primary-border: rgba(16, 185, 129, 0.35);
+  --primary-glow: rgba(16, 185, 129, 0.4);
+  --primary-banner-title: #34D399;
+  --bg-grad-1: rgba(16, 185, 129, 0.12);
+  --bg-grad-2: rgba(245, 158, 11, 0.08);
+  --accent: #F59E0B;
+  --on-primary: #064E3B;
 }
 
 [data-theme="light"] {
   --bg-dark: #F8FAFC;
-  --bg-grad-1: rgba(16, 185, 129, 0.08);
-  --bg-grad-2: rgba(245, 158, 11, 0.05);
   --card-bg: rgba(255, 255, 255, 0.95);
   --card-border: rgba(0, 0, 0, 0.09);
   --text-main: #1E293B;
   --text-muted: #64748B;
   --heading-color: #0F172A;
-  --primary: #059669;
-  --primary-hover: #10B981;
-  --gold: #D97706;
   --navy: #1E293B;
   --dim-item-bg: #F1F5F9;
   --dim-track-bg: #E2E8F0;
@@ -42,6 +46,133 @@
   --tab-container-bg: #E2E8F0;
   --tab-active-bg: #FFFFFF;
   --shadow-color: rgba(15, 23, 42, 0.08);
+
+  /* Emerald on light — deeper for contrast */
+  --primary: #059669;
+  --primary-hover: #10B981;
+  --primary-deep: #047857;
+  --primary-soft: rgba(5, 150, 105, 0.1);
+  --primary-border: rgba(5, 150, 105, 0.28);
+  --primary-glow: rgba(5, 150, 105, 0.22);
+  --primary-banner-title: #047857;
+  --bg-grad-1: rgba(5, 150, 105, 0.08);
+  --bg-grad-2: rgba(217, 119, 6, 0.05);
+  --accent: #D97706;
+  --on-primary: #FFFFFF;
+}
+
+/* ---- Score tiers: dark (default) atmosphere ---- */
+[data-tier="sapphire"] {
+  --primary: #60A5FA;
+  --primary-hover: #93C5FD;
+  --primary-deep: #3B82F6;
+  --primary-soft: rgba(96, 165, 250, 0.14);
+  --primary-border: rgba(96, 165, 250, 0.4);
+  --primary-glow: rgba(59, 130, 246, 0.45);
+  --primary-banner-title: #93C5FD;
+  --bg-grad-1: rgba(59, 130, 246, 0.14);
+  --bg-grad-2: rgba(56, 189, 248, 0.08);
+  --accent: #38BDF8;
+  --on-primary: #0B1B33;
+}
+
+[data-tier="amethyst"] {
+  --primary: #C084FC;
+  --primary-hover: #E9D5FF;
+  --primary-deep: #A855F7;
+  --primary-soft: rgba(192, 132, 252, 0.14);
+  --primary-border: rgba(192, 132, 252, 0.4);
+  --primary-glow: rgba(168, 85, 247, 0.45);
+  --primary-banner-title: #E9D5FF;
+  --bg-grad-1: rgba(168, 85, 247, 0.14);
+  --bg-grad-2: rgba(244, 114, 182, 0.08);
+  --accent: #F472B6;
+  --on-primary: #2E1065;
+}
+
+[data-tier="gold"] {
+  --primary: #FBBF24;
+  --primary-hover: #FDE68A;
+  --primary-deep: #F59E0B;
+  --primary-soft: rgba(251, 191, 36, 0.14);
+  --primary-border: rgba(251, 191, 36, 0.4);
+  --primary-glow: rgba(245, 158, 11, 0.5);
+  --primary-banner-title: #FDE68A;
+  --bg-grad-1: rgba(245, 158, 11, 0.14);
+  --bg-grad-2: rgba(249, 115, 22, 0.08);
+  --accent: #FB923C;
+  --on-primary: #422006;
+}
+
+[data-tier="ruby"] {
+  --primary: #F87171;
+  --primary-hover: #FCA5A5;
+  --primary-deep: #EF4444;
+  --primary-soft: rgba(248, 113, 113, 0.14);
+  --primary-border: rgba(248, 113, 113, 0.4);
+  --primary-glow: rgba(239, 68, 68, 0.5);
+  --primary-banner-title: #FCA5A5;
+  --bg-grad-1: rgba(239, 68, 68, 0.14);
+  --bg-grad-2: rgba(251, 191, 36, 0.08);
+  --accent: #FBBF24;
+  --on-primary: #450A0A;
+}
+
+/* ---- Score tiers: light atmosphere (deeper hues for white paper) ---- */
+[data-theme="light"][data-tier="sapphire"] {
+  --primary: #2563EB;
+  --primary-hover: #3B82F6;
+  --primary-deep: #1D4ED8;
+  --primary-soft: rgba(37, 99, 235, 0.1);
+  --primary-border: rgba(37, 99, 235, 0.28);
+  --primary-glow: rgba(37, 99, 235, 0.22);
+  --primary-banner-title: #1D4ED8;
+  --bg-grad-1: rgba(37, 99, 235, 0.08);
+  --bg-grad-2: rgba(14, 165, 233, 0.06);
+  --accent: #0284C7;
+  --on-primary: #FFFFFF;
+}
+
+[data-theme="light"][data-tier="amethyst"] {
+  --primary: #7C3AED;
+  --primary-hover: #8B5CF6;
+  --primary-deep: #6D28D9;
+  --primary-soft: rgba(124, 58, 237, 0.1);
+  --primary-border: rgba(124, 58, 237, 0.28);
+  --primary-glow: rgba(124, 58, 237, 0.22);
+  --primary-banner-title: #6D28D9;
+  --bg-grad-1: rgba(124, 58, 237, 0.08);
+  --bg-grad-2: rgba(219, 39, 119, 0.05);
+  --accent: #DB2777;
+  --on-primary: #FFFFFF;
+}
+
+[data-theme="light"][data-tier="gold"] {
+  --primary: #D97706;
+  --primary-hover: #F59E0B;
+  --primary-deep: #B45309;
+  --primary-soft: rgba(217, 119, 6, 0.1);
+  --primary-border: rgba(217, 119, 6, 0.28);
+  --primary-glow: rgba(217, 119, 6, 0.22);
+  --primary-banner-title: #B45309;
+  --bg-grad-1: rgba(217, 119, 6, 0.08);
+  --bg-grad-2: rgba(234, 88, 12, 0.05);
+  --accent: #EA580C;
+  --on-primary: #FFFFFF;
+}
+
+[data-theme="light"][data-tier="ruby"] {
+  --primary: #DC2626;
+  --primary-hover: #EF4444;
+  --primary-deep: #B91C1C;
+  --primary-soft: rgba(220, 38, 38, 0.1);
+  --primary-border: rgba(220, 38, 38, 0.28);
+  --primary-glow: rgba(220, 38, 38, 0.22);
+  --primary-banner-title: #B91C1C;
+  --bg-grad-1: rgba(220, 38, 38, 0.08);
+  --bg-grad-2: rgba(217, 119, 6, 0.05);
+  --accent: #D97706;
+  --on-primary: #FFFFFF;
 }
 
 * {
@@ -60,7 +191,7 @@ body {
   min-height: 100vh;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
-  transition: background-color 0.25s ease, color 0.25s ease;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .container {
@@ -90,7 +221,7 @@ body {
 .brand-logo {
   width: 36px;
   height: 36px;
-  background: linear-gradient(135deg, #10B981, #059669);
+  background: linear-gradient(135deg, var(--primary), var(--primary-deep));
   border-radius: 9px;
   display: flex;
   align-items: center;
@@ -98,7 +229,8 @@ body {
   font-weight: 900;
   font-size: 18px;
   color: #FFF;
-  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+  box-shadow: 0 4px 12px var(--primary-glow);
+  transition: background 0.3s ease, box-shadow 0.3s ease;
 }
 
 .brand-text h1 {
@@ -159,11 +291,12 @@ body {
   display: flex;
   align-items: center;
   gap: 12px;
-  background: rgba(16, 185, 129, 0.12);
-  border: 1px solid rgba(16, 185, 129, 0.35);
+  background: var(--primary-soft);
+  border: 1px solid var(--primary-border);
   border-radius: 12px;
   padding: 14px 20px;
   margin-bottom: 28px;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 .verified-banner.unverified {
@@ -178,7 +311,8 @@ body {
 .verified-banner-text h2 {
   font-size: 15px;
   font-weight: 800;
-  color: #34D399;
+  color: var(--primary-banner-title);
+  transition: color 0.3s ease;
 }
 
 .verified-banner.unverified .verified-banner-text h2 {
@@ -227,11 +361,13 @@ body {
   margin-top: 6px;
   font-size: 14px;
   font-weight: 700;
-  color: var(--gold);
+  color: var(--primary);
+  transition: color 0.3s ease;
 }
 
 .candidate-title .medal-svg {
   display: block;
+  color: inherit;
 }
 
 .candidate-date {
@@ -249,7 +385,8 @@ body {
   font-weight: 900;
   line-height: 1;
   color: var(--heading-color);
-  text-shadow: 0 0 30px rgba(16, 185, 129, 0.4);
+  text-shadow: 0 0 30px var(--primary-glow);
+  transition: text-shadow 0.3s ease;
 }
 
 .score-badge .score-label {
@@ -257,13 +394,15 @@ body {
   font-weight: 700;
   color: var(--primary);
   text-transform: uppercase;
+  transition: color 0.3s ease;
 }
 
 .score-badge .percentile-text {
   font-size: 13px;
   font-weight: 600;
-  color: var(--gold);
+  color: var(--primary);
   margin-top: 2px;
+  transition: color 0.3s ease;
 }
 
 /* Inline SVG Icon Helpers */
@@ -277,7 +416,7 @@ body {
 .shield-svg {
   width: 32px;
   height: 32px;
-  color: #10B981;
+  color: var(--primary);
 }
 
 .verified-banner.unverified .shield-svg {
@@ -350,7 +489,7 @@ body {
 
 .dim-item:hover {
   transform: translateY(-2px);
-  border-color: rgba(16, 185, 129, 0.3);
+  border-color: var(--primary-border);
 }
 
 .dim-header {
@@ -383,9 +522,9 @@ body {
 
 .dim-bar-fill {
   height: 100%;
-  background: linear-gradient(90deg, #059669, #10B981);
+  background: linear-gradient(90deg, var(--primary-deep), var(--primary));
   border-radius: 99px;
-  transition: width 1s ease-out;
+  transition: width 1s ease-out, background 0.3s ease;
 }
 
 .dim-desc {
@@ -514,12 +653,13 @@ body {
 /* Mega CTA Banner */
 .cta-banner {
   margin-top: 44px;
-  background: linear-gradient(135deg, rgba(16, 185, 129, 0.2) 0%, rgba(5, 150, 105, 0.1) 100%);
-  border: 1px solid rgba(16, 185, 129, 0.35);
+  background: linear-gradient(135deg, var(--primary-soft) 0%, transparent 100%);
+  border: 1px solid var(--primary-border);
   border-radius: 20px;
   padding: 40px 32px;
   text-align: center;
   box-shadow: 0 12px 30px var(--shadow-color);
+  transition: background 0.3s ease, border-color 0.3s ease;
 }
 
 .cta-banner h2 {
@@ -541,22 +681,21 @@ body {
   align-items: center;
   justify-content: center;
   gap: 10px;
-  background: #10B981;
-  color: #064E3B;
+  background: var(--primary);
+  color: var(--on-primary);
   font-size: 18px;
   font-weight: 900;
   padding: 16px 40px;
   border-radius: 12px;
   text-decoration: none;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+  transition: transform 0.15s, box-shadow 0.15s, background 0.3s ease;
+  box-shadow: 0 6px 20px var(--primary-glow);
 }
 
 .cta-btn:hover {
-  background: #34D399;
+  background: var(--primary-hover);
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(16, 185, 129, 0.55);
+  box-shadow: 0 8px 25px var(--primary-glow);
 }
 
 /* Footer */

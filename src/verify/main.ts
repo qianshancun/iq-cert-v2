@@ -1,6 +1,6 @@
 import { extractTokenFromLocation } from '../shared/constants';
 import { getDimensionsI18n, getVerifyI18n, normalizeLang } from '../shared/i18n';
-import { getMedalTier, medalSvgHtml } from '../shared/medal';
+import { applyScoreTheme, medalSvgHtml } from '../shared/medal';
 import { decodeCertificateToken } from '../shared/token';
 import type { IQCertDesign, IQCertificatePayload } from '../shared/types';
 import { ensureCertFonts } from '../engine/fonts';
@@ -69,13 +69,14 @@ class VerificationApp {
     const dimsI18n = getDimensionsI18n(this.payload.l);
 
     const archetype = getArchetype(this.payload.s);
-    const medal = getMedalTier(this.payload.s);
+    applyScoreTheme(this.payload.s);
     const dimensions = normalizeDimensions(this.payload.m);
     const title = archetype.titleEn;
     const subtitle = archetype.subtitleEn;
     const backtrackUrl = getBacktrackUrl(this.payload.l);
     const displayRef = formatDisplayRef(this.payload.id);
-    const medalIcon = medalSvgHtml(this.payload.s, 22);
+    // Inherit page --primary (score atmosphere) via currentColor
+    const medalIcon = medalSvgHtml(undefined, 22);
 
     app.innerHTML = `
       <div class="container">
@@ -110,13 +111,13 @@ class VerificationApp {
           <div class="candidate-header">
             <div class="candidate-info">
               <h2>${this.payload.n}</h2>
-              <div class="candidate-title" style="color:${medal.color}">${medalIcon} ${title}</div>
+              <div class="candidate-title">${medalIcon} ${title}</div>
               <div class="candidate-date">${t.issuedDate} ${this.payload.d} · ${t.certId} ARM-${displayRef}</div>
             </div>
             <div class="score-badge">
               <div class="score-val">${this.payload.s}</div>
               <div class="score-label">${t.scoreLabel}</div>
-              <div class="percentile-text" style="color:${medal.color}">${t.rankPrefix}${archetype.percentile}</div>
+              <div class="percentile-text">${t.rankPrefix}${archetype.percentile}</div>
             </div>
           </div>
 
@@ -277,16 +278,20 @@ class VerificationApp {
     if (!ctx) return;
 
     const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+    const css = getComputedStyle(document.documentElement);
+    const primary = css.getPropertyValue('--primary').trim() || '#10B981';
+    const primaryDeep = css.getPropertyValue('--primary-deep').trim() || primary;
+    const primarySoft = css.getPropertyValue('--primary-soft').trim() || 'rgba(16, 185, 129, 0.25)';
     const dimensions = normalizeDimensions(this.payload.m);
     ctx.clearRect(0, 0, 400, 400);
 
     drawRadarChart(ctx, 200, 200, 130, dimensions, 'en', {
       gridColor: isLight ? 'rgba(0, 0, 0, 0.1)' : 'rgba(255, 255, 255, 0.1)',
       axisColor: isLight ? 'rgba(0, 0, 0, 0.15)' : 'rgba(255, 255, 255, 0.15)',
-      fillColor: isLight ? 'rgba(5, 150, 105, 0.2)' : 'rgba(16, 185, 129, 0.25)',
-      strokeColor: isLight ? '#059669' : '#10B981',
+      fillColor: primarySoft,
+      strokeColor: isLight ? primaryDeep : primary,
       labelColor: isLight ? '#475569' : '#9CA3AF',
-      valueColor: isLight ? '#059669' : '#10B981',
+      valueColor: isLight ? primaryDeep : primary,
       labelFont: font(600, 13, FONT.grotesk),
       dotRadius: 4.5,
       lineWidth: 2.5,
