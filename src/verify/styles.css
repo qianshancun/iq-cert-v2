@@ -221,11 +221,17 @@ body {
 }
 
 .candidate-title {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   margin-top: 6px;
   font-size: 14px;
   font-weight: 700;
   color: var(--gold);
+}
+
+.candidate-title .medal-svg {
+  display: block;
 }
 
 .candidate-date {

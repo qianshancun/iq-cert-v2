@@ -1,5 +1,6 @@
 import { isSensitiveName } from '../../shared/constants';
 import { getModalI18n, type ModalTranslations } from '../../shared/i18n';
+import { medalSvgHtml } from '../../shared/medal';
 import type { IQCertDesign, IQCertificatePayload, IQCertificateStartData } from '../../shared/types';
 import { ensureCertFonts } from '../fonts';
 import { buildCertificatePayload } from '../payload';
@@ -366,7 +367,7 @@ export class CertificateModal {
     overlay.innerHTML = `
       <div class="arm-cert-dialog" role="dialog" aria-modal="true">
         <div class="arm-cert-header">
-          <h3>🎖️ ${t.modalTitle}</h3>
+          <h3 style="display:inline-flex;align-items:center;gap:8px;">${medalSvgHtml(this.data.score, 18)} ${t.modalTitle}</h3>
           <button class="arm-cert-close-btn" id="arm-cert-close-btn" aria-label="Close">×</button>
         </div>
         <div class="arm-cert-body">
@@ -407,7 +408,7 @@ export class CertificateModal {
     overlay.innerHTML = `
       <div class="arm-cert-dialog" role="dialog" aria-modal="true">
         <div class="arm-cert-header">
-          <h3>🎖️ ${t.modalTitle}</h3>
+          <h3 style="display:inline-flex;align-items:center;gap:8px;">${medalSvgHtml(this.data.score, 18)} ${t.modalTitle}</h3>
           <button class="arm-cert-close-btn" id="arm-cert-close-btn" aria-label="Close">×</button>
         </div>
         <div class="arm-cert-body">
@@ -495,7 +496,7 @@ export class CertificateModal {
     overlay.innerHTML = `
       <div class="arm-cert-dialog" role="dialog" aria-modal="true">
         <div class="arm-cert-header">
-          <h3>🎖️ ${t.modalTitle} · ${this.payload.n} (${this.payload.s})</h3>
+          <h3 style="display:inline-flex;align-items:center;gap:8px;">${medalSvgHtml(this.payload.s, 18)} ${t.modalTitle} · ${this.payload.n} (${this.payload.s})</h3>
           <button class="arm-cert-close-btn" id="arm-cert-close-btn" aria-label="Close">×</button>
         </div>
         <div class="arm-cert-body">

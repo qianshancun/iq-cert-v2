@@ -1,5 +1,6 @@
 import { extractTokenFromLocation } from '../shared/constants';
 import { getDimensionsI18n, getVerifyI18n, normalizeLang } from '../shared/i18n';
+import { getMedalTier, medalSvgHtml } from '../shared/medal';
 import { decodeCertificateToken } from '../shared/token';
 import type { IQCertDesign, IQCertificatePayload } from '../shared/types';
 import { ensureCertFonts } from '../engine/fonts';
@@ -68,11 +69,13 @@ class VerificationApp {
     const dimsI18n = getDimensionsI18n(this.payload.l);
 
     const archetype = getArchetype(this.payload.s);
+    const medal = getMedalTier(this.payload.s);
     const dimensions = normalizeDimensions(this.payload.m);
     const title = archetype.titleEn;
     const subtitle = archetype.subtitleEn;
     const backtrackUrl = getBacktrackUrl(this.payload.l);
     const displayRef = formatDisplayRef(this.payload.id);
+    const medalIcon = medalSvgHtml(this.payload.s, 22);
 
     app.innerHTML = `
       <div class="container">
@@ -107,13 +110,13 @@ class VerificationApp {
           <div class="candidate-header">
             <div class="candidate-info">
               <h2>${this.payload.n}</h2>
-              <div class="candidate-title">🎖️ ${title}</div>
+              <div class="candidate-title" style="color:${medal.color}">${medalIcon} ${title}</div>
               <div class="candidate-date">${t.issuedDate} ${this.payload.d} · ${t.certId} ARM-${displayRef}</div>
             </div>
             <div class="score-badge">
               <div class="score-val">${this.payload.s}</div>
               <div class="score-label">${t.scoreLabel}</div>
-              <div class="percentile-text">${t.rankPrefix}${archetype.percentile}</div>
+              <div class="percentile-text" style="color:${medal.color}">${t.rankPrefix}${archetype.percentile}</div>
             </div>
           </div>
 
