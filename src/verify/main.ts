@@ -75,7 +75,6 @@ class VerificationApp {
     applyScoreTheme(this.payload.s);
     const dimensions = normalizeDimensions(this.payload.m);
     const title = archetype.titleEn;
-    const subtitle = archetype.subtitleEn;
     const backtrackUrl = getBacktrackUrl(this.payload.l);
     const displayRef = formatDisplayRef(this.payload.id);
     // Inherit page --primary (score atmosphere) via currentColor
@@ -105,7 +104,7 @@ class VerificationApp {
           </div>
           <div class="verified-banner-text">
             <h2>${this.isAuthentic ? t.verifiedTitle : t.tamperedTitle}</h2>
-            <p>${this.isAuthentic && this.payload.r ? 'Record checksum matches. This does not independently verify identity, testing conditions, or clinical validity.' : this.isAuthentic ? t.verifiedDesc : t.tamperedDesc}</p>
+            <p>${this.isAuthentic ? t.verifiedDesc : t.tamperedDesc}</p>
           </div>
         </div>
 
@@ -124,7 +123,7 @@ class VerificationApp {
             </div>
           </div>
 
-          <p style="margin-top: 18px; font-size: 14px; color: var(--text-muted); line-height: 1.6;">${this.payload.r ? 'Reference: recent AREALME participants across all languages. This is not a world-population rank.' : subtitle}</p>
+          <p style="margin-top: 18px; font-size: 14px; color: var(--text-muted); line-height: 1.6;">${this.payload.r ? t.referenceNote : t.footerNote}</p>
           <section class="score-reference" style="padding:16px;margin-top:18px;border:1px solid var(--border-color);border-radius:12px;line-height:1.7;overflow-wrap:anywhere;">
             <strong>${escapeHtml(referenceFooter(this.payload))}</strong><p>${escapeHtml(referenceDetail(this.payload))}</p>
           </section>
@@ -203,7 +202,7 @@ class VerificationApp {
               radius="8px"
               gap="12"
               url="${window.location.href}"
-              title="I scored ${this.payload.s} on the Official AREALME IQ Test (${percentileLabel(this.payload)})! Check my verified cognitive report:"
+              title="I scored ${this.payload.s} on the Official AREALME IQ Test (${percentileLabel(this.payload)})! View my online test record:"
             ></social-share>
           </section>
         </main>

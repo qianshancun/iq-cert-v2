@@ -31,7 +31,7 @@ await ctx.rebuild();
 
 // Also copy to verify assets directory so the worker can serve it
 fs.copyFileSync('dist/iq-cert.js', 'dist/verify/iq-cert.js');
-fs.copyFileSync('dist/iq-cert.js', 'dist/verify/iq-cert-v2.2.0.js');
+fs.copyFileSync('dist/iq-cert.js', 'dist/verify/iq-cert-v2.2.1.js');
 
 console.log('✅ iq-cert.js built successfully!');
 

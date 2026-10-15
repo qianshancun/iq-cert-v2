@@ -117,7 +117,7 @@ export function renderAcademic(
 
   drawType(
     ctx,
-    'has successfully completed the ARealMe Standardized IQ Assessment and attained the distinction of',
+    'has successfully completed the ARealMe Online IQ Test and attained the distinction of',
     CX,
     448,
     { font: font(500, 25, FONT.serif), color: INK_SOFT, align: 'center', maxWidth: 1300 }

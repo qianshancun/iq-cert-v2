@@ -152,7 +152,7 @@ export function renderSwiss(
   });
   drawType(
     ctx,
-    'has completed the ARealMe Standardized IQ Assessment and is classified as',
+    'has completed the ARealMe Online IQ Test and is classified as',
     RX,
     332,
     { font: font(400, 18, FONT.grotesk), color: INK_SOFT, maxWidth: RR - RX }

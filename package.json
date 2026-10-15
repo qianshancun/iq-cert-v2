@@ -1,6 +1,6 @@
 {
   "name": "iq-cert-v2",
-  "version": "2.2.0",
+  "version": "2.2.1",
   "description": "Next-generation ARealMe IQ Certificate Engine, Verification Portal, and Cloudflare Worker",
   "main": "dist/iq-cert.js",
   "type": "module",
