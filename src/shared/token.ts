@@ -1,3 +1,4 @@
+import { publicReference } from './reference';
 import type { IQCertificatePayload } from './types';
 
 const SECRET_SALT = 'AREALME_IQ_CERT_2026_SALT_SECURE_AUTH';
@@ -56,10 +57,11 @@ export function base64UrlDecode(str: string): string {
 }
 
 /**
- * Computes an 8-character hex signature for tamper-proofing
+ * Computes a public-client checksum. This is not proof of issuer authenticity.
  */
 export async function computeSignature(payload: Omit<IQCertificatePayload, 'sig'>): Promise<string> {
-  const message = `${payload.id}|${payload.n}|${payload.s}|${payload.d}|${payload.m.join(',')}|${payload.l}|${SECRET_SALT}`;
+  const reference = payload.v >= 4 && payload.r ? `|v4|${JSON.stringify(publicReference(payload.r, true))}` : '';
+  const message = `${payload.id}|${payload.n}|${payload.s}|${payload.d}|${payload.m.join(',')}|${payload.l}|${SECRET_SALT}${reference}`;
   const data = new TextEncoder().encode(message);
 
   if (typeof crypto !== 'undefined' && crypto.subtle) {
@@ -78,6 +80,37 @@ export async function computeSignature(payload: Omit<IQCertificatePayload, 'sig'
   return (h >>> 0).toString(16).padStart(8, '0');
 }
 
+const REFERENCE_KINDS = ['pooled','age-adjusted','approximate'] as const;
+const REFERENCE_MODES = ['quick','complete','standard'] as const;
+const REFERENCE_AGES = ['', 'under_13','13_17','18_34','35_54','55_plus'];
+function encodeReference(value: NonNullable<IQCertificatePayload['r']>): Uint8Array {
+  const model = new TextEncoder().encode(value.model);
+  const bytes = new Uint8Array(1 + model.length + 13);
+  bytes[0] = model.length; bytes.set(model,1);
+  const view = new DataView(bytes.buffer); let i=1+model.length;
+  bytes[i++] = REFERENCE_KINDS.indexOf(value.kind); bytes[i++] = REFERENCE_MODES.indexOf(value.mode);
+  view.setUint32(i,value.sampleSize);i+=4;
+  view.setUint16(i,dateToDays(value.period[0]));i+=2;
+  view.setUint16(i,dateToDays(value.period[1]));i+=2;
+  view.setUint16(i,value.percentile === null ? 65535 : Math.round(value.percentile*10));i+=2;
+  bytes[i] = Math.max(0,REFERENCE_AGES.indexOf(value.ageGroup || ''));
+  return bytes;
+}
+function decodeReference(bytes: Uint8Array): IQCertificatePayload['r'] {
+  const length=bytes[0];
+  if (!length || bytes.length !== 1+length+13) return undefined;
+  const model=new TextDecoder().decode(bytes.subarray(1,1+length));
+  const view=new DataView(bytes.buffer,bytes.byteOffset,bytes.byteLength);let i=1+length;
+  const kind=REFERENCE_KINDS[bytes[i++]],mode=REFERENCE_MODES[bytes[i++]];
+  const sampleSize=view.getUint32(i);i+=4;
+  const start=daysToDate(view.getUint16(i)).replace(/\./g,'-');i+=2;
+  const end=daysToDate(view.getUint16(i)).replace(/\./g,'-');i+=2;
+  const p=view.getUint16(i);i+=2;
+  const age=bytes[i];if(age>=REFERENCE_AGES.length)return undefined;
+  return publicReference({model,kind,mode,sampleSize,period:[start,end],percentile:p===65535?null:p/10,
+    ...(age ? {ageGroup:REFERENCE_AGES[age]} : {})},true);
+}
+
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 /**
@@ -90,8 +123,13 @@ export async function encodeCertificateToken(
   const sig = await computeSignature(payloadWithoutSig);
   const encoder = new TextEncoder();
 
+  const ref = publicReference(payloadWithoutSig.r, true);
+  if (payloadWithoutSig.r && !ref) throw new Error('Invalid score reference');
+  const refBytes = ref ? encodeReference(ref) : new Uint8Array();
+  if (refBytes.length > 1024) throw new Error('Reference too large');
   const langBytes = encoder.encode(payloadWithoutSig.l || 'en');
   const nameBytes = encoder.encode(payloadWithoutSig.n);
+  if (langBytes.length > 32 || nameBytes.length > 255) throw new Error('Certificate text too long');
 
   const rawId = payloadWithoutSig.id || '';
   const isUuid = UUID_REGEX.test(rawId);
@@ -130,12 +168,13 @@ export async function encodeCertificateToken(
     1 + langBytes.length +
     1 + nameBytes.length +
     1 + idBytes.length +
+    (ref ? 2 + refBytes.length : 0) +
     4; // signature
 
   const buffer = new Uint8Array(totalLength);
   let offset = 0;
 
-  buffer[offset++] = 0x03; // version 3
+  buffer[offset++] = ref ? 0x04 : 0x03;
   buffer[offset++] = Math.max(0, Math.min(255, Math.round(payloadWithoutSig.s)));
 
   buffer[offset++] = (days >> 8) & 0xff;
@@ -157,6 +196,12 @@ export async function encodeCertificateToken(
   buffer.set(idBytes, offset);
   offset += idBytes.length;
 
+  if (ref) {
+    buffer[offset++] = (refBytes.length >> 8) & 0xff;
+    buffer[offset++] = refBytes.length & 0xff;
+    buffer.set(refBytes, offset);
+    offset += refBytes.length;
+  }
   buffer.set(sigBytes, offset);
 
   return bytesToBase64Url(buffer);
@@ -170,11 +215,12 @@ export async function decodeCertificateToken(
   token: string
 ): Promise<{ valid: boolean; payload: IQCertificatePayload | null }> {
   try {
+    if (token.length > 4096) return { valid: false, payload: null };
     const bytes = base64UrlToBytes(token);
     if (bytes.length === 0) return { valid: false, payload: null };
 
     // Format v3: Compact Binary
-    if (bytes[0] === 0x03) {
+    if (bytes[0] === 0x03 || bytes[0] === 0x04) {
       if (bytes.length < 18) return { valid: false, payload: null };
 
       let offset = 1;
@@ -210,6 +256,15 @@ export async function decodeCertificateToken(
         offset += idHeader;
       }
 
+      let reference;
+      if (bytes[0] === 0x04) {
+        const length = (bytes[offset++] << 8) | bytes[offset++];
+        if (length > 1024 || offset + length + 4 !== bytes.length) return { valid: false, payload: null };
+        reference = decodeReference(bytes.subarray(offset, offset + length));
+        if (!reference) return { valid: false, payload: null };
+        offset += length;
+      }
+      if (offset + 4 !== bytes.length || score > 160 || m.some(x => x > 100)) return { valid: false, payload: null };
       const sigParts: string[] = [];
       for (let i = 0; i < 4; i++) {
         sigParts.push(bytes[offset++].toString(16).padStart(2, '0'));
@@ -223,7 +278,8 @@ export async function decodeCertificateToken(
         d: date,
         m,
         l: lang,
-        v: 3,
+        v: bytes[0],
+        ...(reference ? { r: reference } : {}),
       };
 
       const expectedSig = await computeSignature(basePayload);
@@ -241,7 +297,7 @@ export async function decodeCertificateToken(
     // Format v2: Legacy JSON
     const json = new TextDecoder().decode(bytes);
     const payload = JSON.parse(json) as IQCertificatePayload;
-    if (!payload || !payload.n || typeof payload.s !== 'number' || !Array.isArray(payload.m)) {
+    if (!payload || typeof payload.n !== 'string' || !payload.n || typeof payload.s !== 'number' || !Array.isArray(payload.m) || payload.r !== undefined || payload.v >= 4) {
       return { valid: false, payload: null };
     }
     const expectedSig = await computeSignature({

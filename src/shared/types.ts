@@ -29,17 +29,30 @@ export interface IQCertificateStartData {
   lang?: IQLanguage | string;
   lockedName?: string;
   verifyBaseUrl?: string;
+  reference?: IQCertificateReference;
+  publishAgeGroup?: boolean;
+  ageDisclosureLabel?: string;
 }
 
+export interface IQCertificateReference {
+  model: string;
+  kind: 'pooled' | 'age-adjusted' | 'approximate';
+  mode: 'quick' | 'complete' | 'standard';
+  sampleSize: number;
+  period: [string, string];
+  percentile: number | null;
+  ageGroup?: string;
+}
 export interface IQCertificatePayload {
+  r?: IQCertificateReference;
   id: string;        // Attempt ID / Unique Hash
   n: string;         // Candidate Name / Initials
   s: number;         // Score (e.g. 141)
   d: string;         // Date (YYYY.MM.DD)
   m: number[];       // 7 Dimension percentages in standard order: [pattern, spatial, numerical, logic, memory, planning, attention]
   l: string;         // Language ('en' | 'cn')
-  sig?: string;      // Tamper-proof signature hash
-  v: number;         // Payload version (2)
+  sig?: string;      // Public-client integrity checksum; not issuer authentication
+  v: number;         // Payload version (2, 3 or 4)
 }
 
 export interface IQArchetype {

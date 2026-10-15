@@ -1,6 +1,24 @@
 /**
  * Standalone QR Code Generator for Canvas
  * Based on Project Nayuki (MIT License) - Zero Dependencies
+ * https://www.nayuki.io/page/qr-code-generator-library
+ * Copyright (c) Project Nayuki. (MIT License)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of
+ * this software and associated documentation files (the "Software"), to deal in
+ * the Software without restriction, including without limitation the rights to
+ * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+ * the Software, and to permit persons to whom the Software is furnished to do so,
+ * subject to the following conditions:
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  */
 
 export namespace qrcodegen {
@@ -219,7 +237,8 @@ export namespace qrcodegen {
         const dat: Array<byte> = data.slice(k, k + shortBlockLen - blockEccLen + (i >= numShortBlocks ? 1 : 0));
         k += dat.length;
         const ecc: Array<byte> = QrCode.reedSolomonComputeRemainder(dat, rsDiv);
-        if (i >= numShortBlocks) dat.push(0);
+        // Short blocks need one padding byte for the interleave loop below.
+        if (i < numShortBlocks) dat.push(0);
         blocks.push(dat.concat(ecc));
       }
 
@@ -433,7 +452,7 @@ export namespace qrcodegen {
       if (text === '') return [];
       if (QrSegment.isNumeric(text)) return [QrSegment.makeNumeric(text)];
       if (QrSegment.isAlphanumeric(text)) return [QrSegment.makeAlphanumeric(text)];
-      return [QrSegment.makeBytes(new TextEncoder().encode(text))];
+      return [QrSegment.makeBytes(Array.from(new TextEncoder().encode(text)))];
     }
 
     public static getTotalBits(segs: Readonly<Array<QrSegment>>, version: int): number {
@@ -508,12 +527,13 @@ export function drawQrOnCanvas(
 ): void {
   const darkColor = options?.darkColor || '#000000';
   const lightColor = options?.lightColor || '#ffffff';
-  const margin = options?.margin ?? 2;
+  const margin = Math.max(4, options?.margin ?? 4);
   const borderRadius = options?.borderRadius ?? 4;
 
   const qr = qrcodegen.QrCode.encodeText(text, qrcodegen.Ecc.MEDIUM);
   const totalModules = qr.size + margin * 2;
-  const cellSize = size / totalModules;
+  const cellSize = Math.max(1, Math.floor(size / totalModules));
+  const inset = (size - totalModules * cellSize) / 2;
 
   ctx.save();
 
@@ -534,8 +554,8 @@ export function drawQrOnCanvas(
   for (let r = 0; r < qr.size; r++) {
     for (let c = 0; c < qr.size; c++) {
       if (qr.getModule(c, r)) {
-        const mx = x + (c + margin) * cellSize;
-        const my = y + (r + margin) * cellSize;
+        const mx = x + inset + (c + margin) * cellSize;
+        const my = y + inset + (r + margin) * cellSize;
         ctx.fillRect(Math.round(mx), Math.round(my), Math.ceil(cellSize), Math.ceil(cellSize));
       }
     }

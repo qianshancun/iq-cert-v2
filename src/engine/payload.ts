@@ -1,4 +1,5 @@
 import { DEFAULT_VERIFY_BASE_URL, buildVerifyUrl } from '../shared/constants';
+import { publicReference } from '../shared/reference';
 import { encodeCertificateToken } from '../shared/token';
 import type { IQCertificatePayload, IQCertificateStartData } from '../shared/types';
 
@@ -33,6 +34,7 @@ export async function buildCertificatePayload(
     norm = [80, 82, 75, 88, 70, 85, 90];
   }
 
+  const reference = publicReference(data.reference, data.publishAgeGroup === true);
   const basePayload: Omit<IQCertificatePayload, 'sig'> = {
     id: attemptId,
     n: name.trim(),
@@ -40,7 +42,8 @@ export async function buildCertificatePayload(
     d: date,
     m: norm,
     l: recordedLang,
-    v: 3,
+    v: reference ? 4 : 3,
+    ...(reference ? { r: reference } : {}),
   };
 
   const token = await encodeCertificateToken(basePayload);

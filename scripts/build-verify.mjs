@@ -13,6 +13,12 @@ console.log('🔨 Building Verification Web Application...');
 
 // 1. Copy index.html and styles.css (asset paths use <base href="/cert/iq/">)
 let html = fs.readFileSync('src/verify/index.html', 'utf8');
+const previewBase = process.env.IQ_CERT_PREVIEW_BASE;
+if (previewBase) {
+  if (!/^\/iq\/cert-preview\.[a-zA-Z0-9-]+\/$/.test(previewBase)) throw new Error('Invalid preview base');
+  html = html.replace('<base href="/iq/cert/">', `<base href="${previewBase}">`)
+    .replace('<meta charset="UTF-8">', '<meta charset="UTF-8"><meta name="robots" content="noindex,nofollow">');
+}
 fs.writeFileSync(path.join(verifyDist, 'index.html'), html, 'utf8');
 fs.copyFileSync('src/verify/styles.css', path.join(verifyDist, 'styles.css'));
 

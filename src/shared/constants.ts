@@ -156,6 +156,7 @@ export const DEFAULT_VERIFY_BASE_URL = 'https://www.arealme.com/iq/cert/v';
  *   https://www.arealme.com/iq/cert/v/<compact-token>
  */
 export function buildVerifyUrl(token: string, baseUrl: string = DEFAULT_VERIFY_BASE_URL): string {
+  if (baseUrl.endsWith('?d=')) return `${baseUrl}${encodeURIComponent(token)}`;
   const base = baseUrl.replace(/\/+$/, '');
   return `${base}/${token}`;
 }

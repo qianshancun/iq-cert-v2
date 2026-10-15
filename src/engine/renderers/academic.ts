@@ -1,3 +1,4 @@
+import { referenceFooter, referenceDetail, percentileLabel } from '../../shared/reference';
 /**
  * Academic — a classical diploma.
  * Centered axis, engraved Roman capitals over a Garamond text face, ivory paper,
@@ -140,7 +141,7 @@ export function renderAcademic(
     monogram: 'IQ',
   });
 
-  drawType(ctx, 'FULL SCALE IQ', CX, 548, {
+  drawType(ctx, payload.r ? 'IQ REFERENCE SCORE' : 'IQ SCORE', CX, 548, {
     font: font(500, 14, FONT.roman),
     color: MUTED,
     align: 'center',
@@ -161,11 +162,11 @@ export function renderAcademic(
   ctx.restore();
   drawRuns(ctx, CX, Math.max(702, scoreBaseline + scoreDescent + 24), 'center', [
     {
-      text: archetype.percentile.toUpperCase(),
+      text: percentileLabel(payload),
       style: { font: font(600, 15, FONT.roman), color: GOLD, tracking: 0.3 },
     },
     {
-      text: 'OF THE GLOBAL POPULATION',
+      text: payload.r ? 'REFERENCE SCORE' : 'ONLINE TEST',
       style: { font: font(500, 15, FONT.roman), color: INK_SOFT, tracking: 0.3 },
       gap: 12,
     },
@@ -255,9 +256,10 @@ export function renderAcademic(
 
   drawType(
     ctx,
-    'Calibrated against global test-taker distributions · Cryptographically signed · Permanent digital record',
+    referenceFooter(payload),
     CX,
-    934,
+    928,
     { font: font(500, 16, FONT.serif, true), color: MUTED, align: 'center', maxWidth: 1200 }
   );
+  drawType(ctx, referenceDetail(payload), CX, 944, { font: font(400, 12, FONT.grotesk), color: MUTED, align: 'center', maxWidth: 1200 });
 }

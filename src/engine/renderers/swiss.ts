@@ -1,3 +1,4 @@
+import { referenceFooter, referenceDetail, percentileLabel } from '../../shared/reference';
 /**
  * Swiss — International Typographic Style.
  * A black score panel against warm paper, one grotesque family at a strict scale,
@@ -70,7 +71,7 @@ export function renderSwiss(
   });
   hairline(ctx, LX, 168.5, LX + LW, RULE_DARK);
 
-  drawType(ctx, 'FULL SCALE IQ', LX, 318, {
+  drawType(ctx, payload.r ? 'IQ REFERENCE SCORE' : 'IQ SCORE', LX, 318, {
     font: font(600, 13, FONT.grotesk),
     color: SILVER,
     tracking: 0.26,
@@ -83,7 +84,7 @@ export function renderSwiss(
     minSize: 120,
   });
 
-  const tagText = `${archetype.percentile.toUpperCase()} WORLDWIDE`;
+  const tagText = `${percentileLabel(payload)} · REFERENCE`;
   const tagFont = font(700, 14, FONT.grotesk);
   const tagW = measureTracked(ctx, tagText, tagFont, 0.16) + 36;
   ctx.fillStyle = ACCENT;
@@ -121,7 +122,7 @@ export function renderSwiss(
     color: SILVER,
   });
   hairline(ctx, qrTextX, qrY + 92.5, LX + LW, RULE_DARK);
-  drawType(ctx, 'Signed token · tamper-evident', qrTextX, qrY + 116, {
+  drawType(ctx, 'Online score record', qrTextX, qrY + 116, {
     font: font(400, 12, FONT.grotesk),
     color: SILVER,
   });
@@ -132,7 +133,7 @@ export function renderSwiss(
     color: INK,
     tracking: 0.24,
   });
-  drawType(ctx, 'STANDARDIZED IQ ASSESSMENT', RR, 108, {
+  drawType(ctx, 'ONLINE IQ ASSESSMENT', RR, 108, {
     font: font(500, 13, FONT.grotesk),
     color: GREY,
     align: 'right',
@@ -232,9 +233,10 @@ export function renderSwiss(
 
   drawType(
     ctx,
-    'Cryptographically bound to the test session · Validated by ARealMe Cognitive Analytics',
+    referenceFooter(payload),
     RX,
     930,
     { font: font(400, 13, FONT.grotesk), color: GREY, maxWidth: RR - RX }
   );
+  drawType(ctx, referenceDetail(payload), RX, 958, { font: font(400, 12, FONT.grotesk), color: GREY, align: 'left', maxWidth: 760 });
 }

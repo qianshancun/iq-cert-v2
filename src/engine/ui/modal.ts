@@ -1,3 +1,4 @@
+const escapeHtml = (value: string) => value.replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]!));
 import { isSensitiveName } from '../../shared/constants';
 import { getModalI18n, type ModalTranslations } from '../../shared/i18n';
 import { medalSvgHtml } from '../../shared/medal';
@@ -21,7 +22,7 @@ export class CertificateModal {
   private fontsListener: (() => void) | null = null;
 
   constructor(data: IQCertificateStartData) {
-    this.data = data;
+    this.data = { ...data, publishAgeGroup: false };
     this.i18n = getModalI18n(data.lang);
   }
 
@@ -496,11 +497,14 @@ export class CertificateModal {
     overlay.innerHTML = `
       <div class="arm-cert-dialog" role="dialog" aria-modal="true">
         <div class="arm-cert-header">
-          <h3 style="display:inline-flex;align-items:center;gap:8px;">${medalSvgHtml(this.payload.s, 18)} ${t.modalTitle} · ${this.payload.n} (${this.payload.s})</h3>
+          <h3 style="display:inline-flex;align-items:center;gap:8px;">${medalSvgHtml(this.payload.s, 18)} ${t.modalTitle} · ${escapeHtml(this.payload.n)} (${this.payload.s})</h3>
           <button class="arm-cert-close-btn" id="arm-cert-close-btn" aria-label="Close">×</button>
         </div>
         <div class="arm-cert-body">
           <div class="arm-cert-preview-wrap">
+            ${this.data.reference?.ageGroup ? `<label class="arm-cert-age-choice" style="display:flex;gap:10px;align-items:start;margin:0 0 18px;font-size:13px;line-height:1.5;text-align:start;">
+              <input id="arm-cert-publish-age" type="checkbox" ${this.data.publishAgeGroup ? 'checked' : ''}>
+              <span>${escapeHtml(this.data.ageDisclosureLabel || 'Show my age group on the certificate and public verification page (optional)')}</span></label>` : ''}
             <div class="arm-cert-tabs">
               <button class="arm-cert-tab active" data-design="academic">${t.tabAcademic}</button>
               <button class="arm-cert-tab" data-design="swiss">${t.tabSwiss}</button>
@@ -541,6 +545,17 @@ export class CertificateModal {
         this.currentDesign = (tab.dataset.design as IQCertDesign) || 'academic';
         this.drawCurrent();
       });
+    });
+
+    overlay.querySelector<HTMLInputElement>('#arm-cert-publish-age')?.addEventListener('change', async (event) => {
+      const checkbox = event.currentTarget as HTMLInputElement;
+      this.data.publishAgeGroup = checkbox.checked;
+      checkbox.disabled = true;
+      const actions = [...overlay!.querySelectorAll<HTMLButtonElement>('.arm-cert-actions button, .arm-cert-tab')];
+      actions.forEach(button => { button.disabled = true; });
+      this.ctx?.clearRect(0, 0, CERT_WIDTH, CERT_HEIGHT);
+      try { await this.initPayload(this.payload!.n); this.drawCurrent(); }
+      finally { checkbox.disabled = false; actions.forEach(button => { button.disabled = false; }); }
     });
 
     // Action buttons

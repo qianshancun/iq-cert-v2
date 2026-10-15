@@ -1,3 +1,5 @@
+import { referenceFooter, referenceDetail, percentileLabel } from '../shared/reference';
+const escapeHtml = (value: unknown) => String(value ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]!));
 import { extractTokenFromLocation } from '../shared/constants';
 import { getDimensionsI18n, getVerifyI18n, normalizeLang } from '../shared/i18n';
 import { applyScoreTheme, medalSvgHtml } from '../shared/medal';
@@ -9,7 +11,8 @@ import { drawRadarChart, FONT, font, formatDisplayRef, getArchetype, normalizeDi
 
 function getBacktrackUrl(lang?: string): string {
   const clean = normalizeLang(lang);
-  return `https://www.arealme.com/iq/${clean || 'en'}/`;
+  const host = location.hostname === 'qe2.arealme.com' ? 'qe2.arealme.com' : 'www.arealme.com';
+  return `https://${host}/iq/${clean || 'en'}/`;
 }
 
 // Fallback demo data if opened without URL parameters
@@ -40,7 +43,7 @@ class VerificationApp {
 
     // Legacy ?d=... → permanent SEO path redirect
     const queryToken = new URLSearchParams(window.location.search).get('d');
-    if (queryToken && !window.location.pathname.match(/\/(?:v|verify)\/[^/?#]+/)) {
+    if (queryToken && !window.location.pathname.includes('/cert-preview.') && !window.location.pathname.match(/\/(?:v|verify)\/[^/?#]+/)) {
       const seoPath = `/iq/cert/v/${queryToken}`;
       window.history.replaceState(null, '', seoPath);
     }
@@ -102,7 +105,7 @@ class VerificationApp {
           </div>
           <div class="verified-banner-text">
             <h2>${this.isAuthentic ? t.verifiedTitle : t.tamperedTitle}</h2>
-            <p>${this.isAuthentic ? t.verifiedDesc : t.tamperedDesc}</p>
+            <p>${this.isAuthentic && this.payload.r ? 'Record checksum matches. This does not independently verify identity, testing conditions, or clinical validity.' : this.isAuthentic ? t.verifiedDesc : t.tamperedDesc}</p>
           </div>
         </div>
 
@@ -110,18 +113,21 @@ class VerificationApp {
         <main class="profile-card">
           <div class="candidate-header">
             <div class="candidate-info">
-              <h2>${this.payload.n}</h2>
+              <h2>${escapeHtml(this.payload.n)}</h2>
               <div class="candidate-title">${medalIcon} ${title}</div>
-              <div class="candidate-date">${t.issuedDate} ${this.payload.d} · ${t.certId} ARM-${displayRef}</div>
+              <div class="candidate-date">${t.issuedDate} ${escapeHtml(this.payload.d)} · ${t.certId} ARM-${escapeHtml(displayRef)}</div>
             </div>
             <div class="score-badge">
               <div class="score-val">${this.payload.s}</div>
               <div class="score-label">${t.scoreLabel}</div>
-              <div class="percentile-text">${t.rankPrefix}${archetype.percentile}</div>
+              <div class="percentile-text">${percentileLabel(this.payload)}</div>
             </div>
           </div>
 
-          <p style="margin-top: 18px; font-size: 14px; color: var(--text-muted); line-height: 1.6;">${subtitle}</p>
+          <p style="margin-top: 18px; font-size: 14px; color: var(--text-muted); line-height: 1.6;">${this.payload.r ? 'Reference: recent AREALME participants across all languages. This is not a world-population rank.' : subtitle}</p>
+          <section class="score-reference" style="padding:16px;margin-top:18px;border:1px solid var(--border-color);border-radius:12px;line-height:1.7;overflow-wrap:anywhere;">
+            <strong>${escapeHtml(referenceFooter(this.payload))}</strong><p>${escapeHtml(referenceDetail(this.payload))}</p>
+          </section>
 
           <!-- 7 Dimensions Analysis -->
           <section class="dimensions-section">
@@ -197,7 +203,7 @@ class VerificationApp {
               radius="8px"
               gap="12"
               url="${window.location.href}"
-              title="I scored ${this.payload.s} on the Official AREALME IQ Test (${archetype.percentile})! Check my verified cognitive report:"
+              title="I scored ${this.payload.s} on the Official AREALME IQ Test (${percentileLabel(this.payload)})! Check my verified cognitive report:"
             ></social-share>
           </section>
         </main>

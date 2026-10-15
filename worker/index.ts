@@ -1,9 +1,10 @@
+import { percentileLabel, referenceFooter } from '../src/shared/reference';
 import { extractTokenFromLocation } from '../src/shared/constants';
 import { decodeCertificateToken } from '../src/shared/token';
 import { getArchetype } from '../src/engine/renderers/common';
 
 export interface Env {
-  ASSETS: Fetcher;
+  ASSETS: { fetch(request: Request): Promise<Response> };
   ENV?: string;
   APP_BASE_URL?: string;
 }
@@ -112,12 +113,12 @@ export default {
     const token = extractTokenFromLocation(path, url.searchParams);
 
     if (token && isBot(request.headers.get('User-Agent'))) {
-      const { payload } = await decodeCertificateToken(token);
-      if (payload) {
+      const { payload, valid } = await decodeCertificateToken(token);
+      if (payload && valid) {
         const archetype = getArchetype(payload.s);
         const title = archetype.titleEn;
         const pageTitle = `${payload.n}'s Official AREALME IQ Certificate: ${payload.s}`;
-        const pageDesc = `Verified IQ Score of ${payload.s} (${title} · ${archetype.percentile} Worldwide). Inspect the 7-dimension cognitive breakdown and official credentials.`;
+        const pageDesc = `Verified IQ Score of ${payload.s} (${title} · ${percentileLabel(payload)}). ${referenceFooter(payload)}. Online test record.`;
 
         const cleanLang = (payload.l || 'en').trim().toLowerCase();
         const testUrl = `https://www.arealme.com/iq/${cleanLang || 'en'}/`;

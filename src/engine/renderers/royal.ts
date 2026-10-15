@@ -1,3 +1,4 @@
+import { referenceFooter, referenceDetail, percentileLabel } from '../../shared/reference';
 /**
  * Royal — black & gold charter with the Cognitive Astrolabe.
  * Left: engraved title lockup, bearer, glowing score, charter details.
@@ -158,7 +159,7 @@ export function renderRoyal(
   });
 
   // ── Score ───────────────────────────────────────────────────────────────
-  drawType(ctx, 'FULL SCALE IQ', LX, 504, {
+  drawType(ctx, payload.r ? 'IQ REFERENCE SCORE' : 'IQ SCORE', LX, 504, {
     font: font(400, 14, FONT.roman),
     color: GOLD_MUTED,
     tracking: 0.34,
@@ -180,11 +181,11 @@ export function renderRoyal(
 
   const tierX = LX + scoreRun.width + 46;
   vline(ctx, tierX - 22, 574, 654, 'rgba(217, 182, 92, 0.45)');
-  drawType(ctx, archetype.percentile.toUpperCase(), tierX, 612, {
+  drawType(ctx, percentileLabel(payload), tierX, 612, {
     font: font(600, 32, FONT.roman),
     color: GOLD_LIGHT,
   });
-  drawType(ctx, 'WORLDWIDE', tierX, 642, {
+  drawType(ctx, 'REFERENCE', tierX, 642, {
     font: font(400, 13, FONT.roman),
     color: GOLD_MUTED,
     tracking: 0.34,
@@ -218,7 +219,7 @@ export function renderRoyal(
     color: CREAM,
   });
   hairline(ctx, LX, 868.5, LX + 400, 'rgba(217, 182, 92, 0.6)');
-  drawType(ctx, 'REGISTRAR · DIGITALLY SIGNED', LX, 892, {
+  drawType(ctx, 'AREALME · ONLINE ASSESSMENT', LX, 892, {
     font: font(400, 11, FONT.roman),
     color: GOLD_MUTED,
     tracking: 0.3,
@@ -283,7 +284,7 @@ export function renderRoyal(
     color: GOLD_MUTED,
     align: 'right',
   });
-  drawType(ctx, 'Signed & tamper-evident', qrX - 26, qrY + 110, {
+  drawType(ctx, 'Online score record', qrX - 26, qrY + 110, {
     font: font(500, 15, FONT.serif, true),
     color: GOLD_MUTED,
     align: 'right',
@@ -292,9 +293,10 @@ export function renderRoyal(
   // ── Footnote ────────────────────────────────────────────────────────────
   drawType(
     ctx,
-    'Accredited by the ARealMe Psychometrics Division · Cryptographically sealed and verifiable',
+    referenceFooter(payload),
     LX,
     938,
     { font: font(500, 16, FONT.serif, true), color: GOLD_MUTED, maxWidth: 800 }
   );
+  drawType(ctx, referenceDetail(payload), LX, 954, { font: font(400, 12, FONT.grotesk), color: GOLD_MUTED, align: 'left', maxWidth: 1320 });
 }
