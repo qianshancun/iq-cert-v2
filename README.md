@@ -102,6 +102,8 @@ Hebrew came out reversed, and Indic and Thai names lost their vowel signs (dotte
 (`src/engine/renderers/common.ts`) now sends such text (right-to-left and joining scripts, combining marks, joiners,
 emoji) through one `fillText` call without letter-spacing. Latin, Greek, Cyrillic, CJK and Hangul are drawn exactly
 as before (checked pixel for pixel in all three designs). `npm test` runs `tests/shaped-text.mjs`.
+Reach: the certificate dialog accepts only Latin letters (since 2026-09-22), so certificates made in the IQ test
+never carried such names; the old drawing showed on hand-made links and on non-Latin text drawn by the engine.
 
 ### Deploy to Cloudflare
 ```bash
