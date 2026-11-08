@@ -1,0 +1,28 @@
+{
+  // Preview of the certificate pages on workers.dev only: https://iq-cert-v2-preview.arealme.workers.dev/iq/cert/...
+  // A separate Worker with NO routes, so a preview deploy can never touch www.arealme.com.
+  //   npm run deploy:preview      (build + wrangler deploy --config wrangler.preview.jsonc)
+  // Production stays wrangler.jsonc (npm run deploy:worker), on the owner's word only.
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "iq-cert-v2-preview",
+  "compatibility_date": "2026-08-24",
+  "compatibility_flags": ["nodejs_compat"],
+  "main": "dist/worker/index.js",
+  "workers_dev": true,
+  "assets": {
+    "directory": "./dist/verify",
+    "binding": "ASSETS",
+    "html_handling": "auto-trailing-slash",
+    "not_found_handling": "single-page-application",
+    "run_worker_first": true
+  },
+  "vars": {
+    "ENV": "preview",
+    "APP_BASE_URL": "https://iq-cert-v2-preview.arealme.workers.dev/iq/cert",
+    "IQ_TEST_URL_EN": "https://www.arealme.com/iq/",
+    "IQ_TEST_URL_CN": "https://www.arealme.com/iq/cn/"
+  },
+  "observability": {
+    "enabled": true
+  }
+}

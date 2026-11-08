@@ -304,6 +304,36 @@ body {
   border-color: rgba(239, 68, 68, 0.35);
 }
 
+.verified-banner.sample {
+  background: rgba(220, 38, 38, 0.08);
+  border-color: rgba(220, 38, 38, 0.35);
+}
+
+.verified-banner.sample .shield-icon,
+.verified-banner.sample .verified-banner-text h2 {
+  color: #DC2626;
+}
+
+.sample-tag {
+  display: inline-block;
+  margin-inline-start: 10px;
+  padding: 2px 10px;
+  border: 1px solid rgba(220, 38, 38, 0.55);
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: .08em;
+  vertical-align: middle;
+  color: #DC2626;
+}
+
+:root:not([data-theme="light"]) .verified-banner.sample .shield-icon,
+:root:not([data-theme="light"]) .verified-banner.sample .verified-banner-text h2,
+:root:not([data-theme="light"]) .sample-tag {
+  color: #F87171;
+  border-color: rgba(248, 113, 113, 0.55);
+}
+
 .verified-banner .shield-icon {
   font-size: 26px;
 }

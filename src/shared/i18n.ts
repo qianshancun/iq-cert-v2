@@ -46,6 +46,11 @@ export interface VerifyTranslations {
   ctaBtn: string;
   footerNote: string;
   referenceNote: string;
+  /** Sample mode (/iq/cert/sample?lang=xx): a labelled example, never a person's record. */
+  sampleTitle: string;
+  sampleDesc: string;
+  sampleName: string;
+  sampleMark: string;
 }
 
 export interface DimensionTranslation {
@@ -348,6 +353,10 @@ export const VERIFY_I18N: Record<string, VerifyTranslations> = {
     ctaBtn: 'Start Free IQ Test Now →',
     referenceNote: "The reference is recent AREALME participants across all languages, not the world population.",
     footerNote: "© 2026 ARealMe.com. Online test record; not a clinical IQ assessment.",
+    sampleTitle: "Sample certificate",
+    sampleDesc: "For illustration only: this is not a real test result and cannot be verified. Complete the IQ test to get your own certificate.",
+    sampleName: "Your Name",
+    sampleMark: "SAMPLE",
   },
   zh: {
     brandName: 'AREALME 官方認證',
@@ -375,6 +384,10 @@ export const VERIFY_I18N: Record<string, VerifyTranslations> = {
     ctaBtn: '立即開始免費智商測驗 →',
     referenceNote: "參考人群是所有語言合併的近期 AREALME 參與者，不代表全球人口。",
     footerNote: "© 2026 ARealMe.com. 線上測驗成績紀錄，不是臨床智力評估。",
+    sampleTitle: "證書樣本",
+    sampleDesc: "僅供示意：這不是真實的測驗結果，也無法驗證。完成 IQ 測驗即可取得你自己的證書。",
+    sampleName: "你的名字",
+    sampleMark: "樣本",
   },
   cn: {
     brandName: 'AREALME 官方认证',
@@ -402,6 +415,10 @@ export const VERIFY_I18N: Record<string, VerifyTranslations> = {
     ctaBtn: '立即开始免费智商测验 →',
     referenceNote: "参考人群是所有语言合并的近期 AREALME 参与者，不代表全球人口。",
     footerNote: "© 2026 ARealMe.com. 在线测试成绩记录，不是临床智力评估。",
+    sampleTitle: "证书样本",
+    sampleDesc: "仅供示意：这不是真实的测试结果，也无法验证。完成 IQ 测试即可获得你自己的证书。",
+    sampleName: "你的名字",
+    sampleMark: "样本",
   },
   pt: {
     brandName: 'AREALME CERTIFICADO',
@@ -429,6 +446,10 @@ export const VERIFY_I18N: Record<string, VerifyTranslations> = {
     ctaBtn: 'Iniciar Teste de QI Grátis Agora →',
     referenceNote: "A referência são participantes recentes da AREALME de todos os idiomas, não a população mundial.",
     footerNote: "© 2026 ARealMe.com. Registro de teste online; não é uma avaliação clínica de QI.",
+    sampleTitle: "Certificado de exemplo",
+    sampleDesc: "Apenas ilustrativo: não é um resultado real e não pode ser verificado. Faça o teste de QI para obter o seu próprio certificado.",
+    sampleName: "Seu nome",
+    sampleMark: "AMOSTRA",
   },
   ko: {
     brandName: 'AREALME 공인 인증',
@@ -456,6 +477,10 @@ export const VERIFY_I18N: Record<string, VerifyTranslations> = {
     ctaBtn: '무료 IQ 테스트 시작하기 →',
     referenceNote: "참조 집단은 모든 언어의 최근 AREALME 참가자이며 세계 인구를 대표하지 않습니다.",
     footerNote: "© 2026 ARealMe.com. 온라인 테스트 기록이며 임상 IQ 평가는 아닙니다.",
+    sampleTitle: "인증서 샘플",
+    sampleDesc: "예시용입니다. 실제 결과가 아니며 인증할 수 없습니다. IQ 테스트를 완료하면 나만의 인증서를 받을 수 있습니다.",
+    sampleName: "이름",
+    sampleMark: "샘플",
   },
   ar: {
     brandName: 'AREALME CERTIFIED',
@@ -483,6 +508,10 @@ export const VERIFY_I18N: Record<string, VerifyTranslations> = {
     ctaBtn: 'ابدأ اختبار الذكاء المجاني الآن ←',
     referenceNote: "المرجع هو المشاركون حديثًا في AREALME بجميع اللغات، وليس سكان العالم.",
     footerNote: "© 2026 ARealMe.com. سجل اختبار عبر الإنترنت؛ ليس تقييمًا سريريًا للذكاء.",
+    sampleTitle: "نموذج شهادة",
+    sampleDesc: "للتوضيح فقط: هذه ليست نتيجة حقيقية ولا يمكن التحقق منها. أكمل اختبار الذكاء للحصول على شهادتك الخاصة.",
+    sampleName: "اسمك",
+    sampleMark: "نموذج",
   },
   es: {
     brandName: 'AREALME CERTIFICADO',
@@ -510,6 +539,10 @@ export const VERIFY_I18N: Record<string, VerifyTranslations> = {
     ctaBtn: 'Comenzar Test de CI Gratis Ahora →',
     referenceNote: "La referencia son participantes recientes de AREALME de todos los idiomas, no la población mundial.",
     footerNote: "© 2026 ARealMe.com. Registro de test en línea; no es una evaluación clínica del CI.",
+    sampleTitle: "Certificado de muestra",
+    sampleDesc: "Solo con fines ilustrativos: no es un resultado real y no se puede verificar. Completa el test de CI para obtener tu propio certificado.",
+    sampleName: "Tu nombre",
+    sampleMark: "MUESTRA",
   },
   uk: {
     brandName: 'AREALME CERTIFIED',
@@ -537,6 +570,10 @@ export const VERIFY_I18N: Record<string, VerifyTranslations> = {
     ctaBtn: 'Почати безкоштовний тест IQ →',
     referenceNote: "Референтна група — недавні учасники AREALME всіма мовами, а не населення світу.",
     footerNote: "© 2026 ARealMe.com. Запис онлайн-тесту; не клінічна оцінка IQ.",
+    sampleTitle: "Зразок сертифіката",
+    sampleDesc: "Лише для ілюстрації: це не справжній результат, і його не можна перевірити. Пройдіть тест IQ, щоб отримати власний сертифікат.",
+    sampleName: "Ваше ім'я",
+    sampleMark: "ЗРАЗОК",
   },
   ja: {
     brandName: 'AREALME 認定証',
@@ -564,6 +601,10 @@ export const VERIFY_I18N: Record<string, VerifyTranslations> = {
     ctaBtn: '今すぐ無料IQテストを開始 →',
     referenceNote: "基準集団は全言語の最近のAREALME参加者であり、世界人口ではありません。",
     footerNote: "© 2026 ARealMe.com. オンラインテストの記録であり、臨床的なIQ評価ではありません。",
+    sampleTitle: "証明書のサンプル",
+    sampleDesc: "説明用のサンプルです。実際の結果ではなく、検証もできません。IQテストを完了すると、あなた自身の証明書を作成できます。",
+    sampleName: "あなたの名前",
+    sampleMark: "サンプル",
   },
   th: {
     brandName: 'AREALME CERTIFIED',
@@ -591,6 +632,10 @@ export const VERIFY_I18N: Record<string, VerifyTranslations> = {
     ctaBtn: 'เริ่มทำแบบทดสอบ IQ ฟรีทันที →',
     referenceNote: "กลุ่มอ้างอิงคือผู้เข้าร่วม AREALME ล่าสุดในทุกภาษา ไม่ใช่ประชากรโลก",
     footerNote: "© 2026 ARealMe.com. บันทึกผลทดสอบออนไลน์ ไม่ใช่การประเมิน IQ ทางคลินิก",
+    sampleTitle: "ตัวอย่างใบรับรอง",
+    sampleDesc: "ใช้เพื่อแสดงตัวอย่างเท่านั้น ไม่ใช่ผลจริงและไม่สามารถตรวจสอบได้ ทำแบบทดสอบ IQ ให้ครบเพื่อรับใบรับรองของคุณเอง",
+    sampleName: "ชื่อของคุณ",
+    sampleMark: "ตัวอย่าง",
   },
   he: {
     brandName: 'AREALME CERTIFIED',
@@ -618,6 +663,10 @@ export const VERIFY_I18N: Record<string, VerifyTranslations> = {
     ctaBtn: 'התחל מבחן IQ חינם עכשיו ←',
     referenceNote: "קבוצת הייחוס היא משתתפי AREALME מהתקופה האחרונה בכל השפות, ולא אוכלוסיית העולם.",
     footerNote: "© 2026 ARealMe.com. רישום מבחן מקוון; אינו הערכת IQ קלינית.",
+    sampleTitle: "דוגמת תעודה",
+    sampleDesc: "להמחשה בלבד: זו אינה תוצאה אמיתית ואי אפשר לאמת אותה. השלימו את מבחן ה-IQ כדי לקבל תעודה משלכם.",
+    sampleName: "השם שלך",
+    sampleMark: "דוגמה",
   },
   pl: {
     brandName: 'AREALME CERTIFIED',
@@ -645,6 +694,10 @@ export const VERIFY_I18N: Record<string, VerifyTranslations> = {
     ctaBtn: 'Rozpocznij darmowy test IQ teraz →',
     referenceNote: "Grupę odniesienia stanowią niedawni uczestnicy AREALME ze wszystkich wersji językowych, a nie ludność świata.",
     footerNote: "© 2026 ARealMe.com. Zapis testu online; nie jest kliniczną oceną IQ.",
+    sampleTitle: "Przykładowy certyfikat",
+    sampleDesc: "Tylko poglądowo: to nie jest prawdziwy wynik i nie można go zweryfikować. Ukończ test IQ, aby otrzymać własny certyfikat.",
+    sampleName: "Twoje imię",
+    sampleMark: "PRZYKŁAD",
   },
   el: {
     brandName: 'AREALME CERTIFIED',
@@ -672,6 +725,10 @@ export const VERIFY_I18N: Record<string, VerifyTranslations> = {
     ctaBtn: 'Ξεκινήστε το Δωρεάν Τεστ IQ Τώρα →',
     referenceNote: "Η ομάδα αναφοράς είναι πρόσφατοι συμμετέχοντες του AREALME σε όλες τις γλώσσες, όχι ο παγκόσμιος πληθυσμός.",
     footerNote: "© 2026 ARealMe.com. Αρχείο διαδικτυακού τεστ· δεν αποτελεί κλινική αξιολόγηση IQ.",
+    sampleTitle: "Δείγμα πιστοποιητικού",
+    sampleDesc: "Μόνο για επίδειξη: δεν είναι πραγματικό αποτέλεσμα και δεν μπορεί να επαληθευτεί. Ολοκλήρωσε το τεστ IQ για να πάρεις το δικό σου πιστοποιητικό.",
+    sampleName: "Το όνομά σου",
+    sampleMark: "ΔΕΙΓΜΑ",
   },
 };
 

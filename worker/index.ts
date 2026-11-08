@@ -159,6 +159,15 @@ export default {
     }
 
     // 6. Forward human requests to static assets
+    // The sample certificate page (/iq/cert/sample) is an illustration: keep it out of search.
+    if (/^\/iq\/cert\/sample\/?$/.test(path)) {
+      const sampleUrl = new URL(request.url);
+      sampleUrl.pathname = '/';
+      const page = await env.ASSETS.fetch(new Request(sampleUrl, request));
+      const headers = new Headers(page.headers);
+      headers.set('X-Robots-Tag', 'noindex');
+      return new Response(page.body, { status: page.status, headers });
+    }
     const assetUrl = new URL(request.url);
     assetUrl.pathname = toAssetPath(path);
     let assetResponse = await env.ASSETS.fetch(new Request(assetUrl, request));

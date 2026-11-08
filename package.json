@@ -12,7 +12,8 @@
     "dev:engine": "node scripts/build-engine.mjs --watch",
     "dev:verify": "node scripts/build-verify.mjs --watch",
     "preview": "node scripts/preview-server.mjs",
-    "deploy:worker": "npm run build && wrangler deploy"
+    "deploy:worker": "npm run build && wrangler deploy",
+    "deploy:preview": "npm run build && wrangler deploy --config wrangler.preview.jsonc"
   },
   "devDependencies": {
     "esbuild": "^0.25.0",

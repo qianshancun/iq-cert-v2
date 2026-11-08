@@ -37,7 +37,7 @@ const server = http.createServer((req, res) => {
   }
 
   // SPA: /iq/cert/v, /iq/cert/v/<token>, /iq/cert/verify/<token>
-  if (pathname.startsWith('/iq/cert/v') || pathname.startsWith('/iq/cert/verify')) {
+  if (pathname.startsWith('/iq/cert/v') || pathname.startsWith('/iq/cert/verify') || /^\/iq\/cert\/sample\/?$/.test(pathname)) {
     const filePath = path.join(ROOT, 'dist/verify/index.html');
     if (fs.existsSync(filePath)) {
       res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });

@@ -86,8 +86,20 @@ npm run preview
 - Open `http://localhost:8787/test-gallery.html` to review all three designs against edge-case payloads.
 - Open `http://localhost:8787/cert/iq/v/<token>` to test the verification landing page (SEO path).
 - Legacy `?d=<token>` redirects to the path form.
+- Open `http://localhost:8787/iq/cert/sample?lang=en` for the sample certificate.
+
+### Sample certificate
+`/iq/cert/sample?lang=<code>` shows a clearly labelled example for the IQ test page to link to (owner, 2026-11-08):
+a "Your Name" placeholder, score 118, a red "Sample certificate" banner saying it is an illustration that cannot be
+verified, a SAMPLE tag by the name and a SAMPLE watermark across every certificate design; no download, no share,
+no disclaimer about link data. It reads no token and checks nothing, so it creates no record. The Worker serves it
+with `X-Robots-Tag: noindex`. Languages: the verifier's 13 (others show English). In Arabic and Hebrew the
+certificate image uses the English placeholder, because the engine draws letter-spaced text glyph by glyph, which
+breaks right-to-left scripts (real certificates with Arabic or Hebrew names have the same problem). Opening the
+verifier with no token at all still shows the old demo certificate (unchanged).
 
 ### Deploy to Cloudflare
 ```bash
-npm run deploy:worker
+npm run deploy:preview   # workers.dev only: https://iq-cert-v2-preview.arealme.workers.dev/iq/cert/... (no routes)
+npm run deploy:worker    # production: www.arealme.com/iq/cert* (owner's word only)
 ```

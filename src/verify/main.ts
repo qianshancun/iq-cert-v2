@@ -15,6 +15,27 @@ function getBacktrackUrl(lang?: string): string {
   return `https://${host}/iq/${clean || 'en'}/`;
 }
 
+/**
+ * Sample mode: /iq/cert/sample?lang=xx shows a clearly labelled example certificate for the IQ test
+ * page to link to (owner, 2026-11-08). It reads no token and checks nothing: the name is a placeholder
+ * ("Your Name"), the banner says it is an illustration that cannot be verified, every certificate
+ * design carries a SAMPLE watermark, and there is no download or share. The Worker serves the page
+ * with X-Robots-Tag: noindex.
+ */
+export const SAMPLE_PATH = /^\/(?:iq\/cert\/)?sample\/?$/;
+function samplePayload(lang: string, name: string): IQCertificatePayload {
+  return {
+    id: 'SAMPLE',
+    n: name,
+    s: 118,
+    d: '2026.01.01',
+    m: [74, 69, 63, 76, 60, 71, 73], // Pattern, Spatial, Numerical, Logic, Memory, Planning, Attention
+    l: lang,
+    sig: '',
+    v: 3,
+  };
+}
+
 // Fallback demo data if opened without URL parameters
 const DEMO_PAYLOAD: IQCertificatePayload = {
   id: 'DEMO-BILL-2026',
@@ -30,6 +51,7 @@ const DEMO_PAYLOAD: IQCertificatePayload = {
 class VerificationApp {
   private payload: IQCertificatePayload = DEMO_PAYLOAD;
   private isAuthentic: boolean = true;
+  private isSample: boolean = false;
   private selectedDesign: IQCertDesign = 'academic';
   private certCanvas: HTMLCanvasElement | null = null;
   private certCtx: CanvasRenderingContext2D | null = null;
@@ -39,6 +61,18 @@ class VerificationApp {
   }
 
   private async init(): Promise<void> {
+    if (SAMPLE_PATH.test(window.location.pathname)) {
+      const lang = normalizeLang(new URLSearchParams(window.location.search).get('lang') || 'en');
+      const t = getVerifyI18n(lang);
+      this.isSample = true;
+      this.isAuthentic = false;
+      this.payload = samplePayload(lang, t.sampleName);
+      document.documentElement.lang = lang === 'cn' ? 'zh-CN' : lang === 'zh' ? 'zh-TW' : lang;
+      document.title = `${t.sampleTitle} | AREALME IQ`;
+      this.render();
+      return;
+    }
+
     const token = extractTokenFromLocation(window.location.pathname, window.location.search);
 
     // Legacy ?d=... → permanent SEO path redirect
@@ -95,6 +129,14 @@ class VerificationApp {
         </header>
 
         <!-- Verification Banner -->
+        ${this.isSample ? `
+        <div class="verified-banner sample" role="note">
+          <div class="shield-icon"><svg class="svg-icon" viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9.5"/><path d="M12 11v6M12 7.5v.01"/></svg></div>
+          <div class="verified-banner-text">
+            <h2>${t.sampleTitle}</h2>
+            <p>${t.sampleDesc}</p>
+          </div>
+        </div>` : `
         <div class="verified-banner ${this.isAuthentic ? '' : 'unverified'}">
           <div class="shield-icon">
             ${this.isAuthentic 
@@ -106,13 +148,13 @@ class VerificationApp {
             <h2>${this.isAuthentic ? t.verifiedTitle : t.tamperedTitle}</h2>
             <p>${this.isAuthentic ? t.verifiedDesc : t.tamperedDesc}</p>
           </div>
-        </div>
+        </div>`}
 
         <!-- Candidate Profile Card -->
         <main class="profile-card">
           <div class="candidate-header">
             <div class="candidate-info">
-              <h2>${escapeHtml(this.payload.n)}</h2>
+              <h2>${escapeHtml(this.payload.n)}${this.isSample ? ` <span class="sample-tag">${t.sampleMark}</span>` : ''}</h2>
               <div class="candidate-title">${medalIcon} ${title}</div>
               <div class="candidate-date">${t.issuedDate} ${escapeHtml(this.payload.d)} · ${t.certId} ARM-${escapeHtml(displayRef)}</div>
             </div>
@@ -177,14 +219,14 @@ class VerificationApp {
               <canvas id="view-cert-canvas" width="1600" height="1000"></canvas>
             </div>
 
-            <button class="btn-download-cert" id="btn-download-png">
+            ${this.isSample ? '' : `<button class="btn-download-cert" id="btn-download-png">
               <svg class="svg-icon download-svg" viewBox="0 0 32 32" fill="currentColor"><path d="m30.71 7.29-6-6a1 1 0 0 0 -.71-.29h-2v8a2 2 0 0 1 -2 2h-8a2 2 0 0 1 -2-2v-8h-6a3 3 0 0 0 -3 3v24a3 3 0 0 0 3 3h2v-9a3 3 0 0 1 3-3h14a3 3 0 0 1 3 3v9h2a3 3 0 0 0 3-3v-20a1 1 0 0 0 -.29-.71z"/><path d="m12 1h8v8h-8z"/><path d="m23 21h-14a1 1 0 0 0 -1 1v9h16v-9a1 1 0 0 0 -1-1z"/></svg>
               ${t.downloadCert}
-            </button>
+            </button>`}
           </section>
 
-          <!-- Rule 5: Verification Page Disclaimer -->
-          <section class="disclaimer-card">
+          <!-- Rule 5: Verification Page Disclaimer (a sample has no link data to disclose, nothing to share) -->
+          ${this.isSample ? '' : `<section class="disclaimer-card">
             <div class="disclaimer-header">
               <svg class="svg-icon disclaimer-svg" viewBox="0 0 60 60" fill="currentColor"><path d="m30 5c-13.7799683 0-25 11.210022-25 25s11.2200317 25 25 25c13.7900391 0 25-11.210022 25-25s-11.2099609-25-25-25zm0 42.75c-2.2000122 0-4-1.789978-4-4s1.7999878-4 4-4c2.210022 0 4 1.789978 4 4s-1.789978 4-4 4zm4.2000122-14.7699585c-.0999756 2.2599487-1.9400024 4.0199585-4.2000122 4.0199585-2.25 0-4.0999756-1.7600098-4.1900024-4.0199585l-.6900024-15.6300049c-.0599976-1.3400269.4200439-2.6199951 1.3500366-3.5900269.9299926-.9699706 2.1900024-1.5100097 3.5299682-1.5100097 1.3500366 0 2.6000366.5400391 3.5400391 1.5100098.9299927.9700317 1.4099731 2.25 1.3499756 3.5900269z"/></svg>
               <h3>${t.disclaimerTitle}</h3>
@@ -204,7 +246,7 @@ class VerificationApp {
               url="${window.location.href}"
               title="I scored ${this.payload.s} on the Official AREALME IQ Test (${percentileLabel(this.payload)})! View my online test record:"
             ></social-share>
-          </section>
+          </section>`}
         </main>
 
         <!-- Viral CTA: Challenge IQ Test -->
@@ -319,7 +361,37 @@ class VerificationApp {
 
   private drawCertificate(): void {
     if (!this.certCtx) return;
-    renderCertificate(this.certCtx, this.selectedDesign, this.payload, window.location.href);
+    // The certificate engine draws the name letter by letter, which breaks right-to-left scripts
+    // (Arabic loses its joining, Hebrew comes out reversed), so the sample's image uses the English
+    // placeholder there; the page text keeps the localized one.
+    const payload = this.isSample && ['ar', 'he'].includes(normalizeLang(this.payload.l))
+      ? { ...this.payload, n: getVerifyI18n('en').sampleName }
+      : this.payload;
+    renderCertificate(this.certCtx, this.selectedDesign, payload, window.location.href);
+    if (this.isSample) this.drawSampleMark(this.certCtx);
+  }
+
+  /** The SAMPLE watermark across every design: one large diagonal word, outlined so it shows on light and dark designs. */
+  private drawSampleMark(ctx: CanvasRenderingContext2D): void {
+    const mark = getVerifyI18n(this.payload.l).sampleMark;
+    const { width, height } = ctx.canvas;
+    ctx.save();
+    ctx.translate(width / 2, height / 2);
+    ctx.rotate(-Math.atan2(height, width) * 0.75);
+    let size = 220;
+    ctx.font = `900 ${size}px Inter, "Noto Sans", system-ui, sans-serif`;
+    const fit = width * 0.82;
+    const measured = ctx.measureText(mark).width;
+    if (measured > fit) { size = Math.floor(size * fit / measured); ctx.font = `900 ${size}px Inter, "Noto Sans", system-ui, sans-serif`; }
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.lineJoin = 'round';
+    ctx.lineWidth = Math.max(4, size / 28);
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.55)';
+    ctx.fillStyle = 'rgba(220, 38, 38, 0.30)';
+    ctx.strokeText(mark, 0, 0);
+    ctx.fillText(mark, 0, 0);
+    ctx.restore();
   }
 }
 
