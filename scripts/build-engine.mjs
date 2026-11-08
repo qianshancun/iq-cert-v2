@@ -31,6 +31,10 @@ await ctx.rebuild();
 
 // Also copy to verify assets directory so the worker can serve it
 fs.copyFileSync('dist/iq-cert.js', 'dist/verify/iq-cert.js');
+// A versioned name per release (package.json), and the previous release's name kept for any page that
+// still asks for it (2.3.0 only changed how shaped scripts are drawn; same API).
+const { version } = JSON.parse(fs.readFileSync('package.json', 'utf8'));
+fs.copyFileSync('dist/iq-cert.js', `dist/verify/iq-cert-v${version}.js`);
 fs.copyFileSync('dist/iq-cert.js', 'dist/verify/iq-cert-v2.2.2.js');
 
 console.log('✅ iq-cert.js built successfully!');

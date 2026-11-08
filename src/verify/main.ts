@@ -17,16 +17,17 @@ function getBacktrackUrl(lang?: string): string {
 
 /**
  * Sample mode: /iq/cert/sample?lang=xx shows a clearly labelled example certificate for the IQ test
- * page to link to (owner, 2026-11-08). It reads no token and checks nothing: the name is a placeholder
- * ("Your Name"), the banner says it is an illustration that cannot be verified, every certificate
+ * page to link to (owner, 2026-11-08). It reads no token and checks nothing: the name is the
+ * placeholder "John Doe" (owner), the banner says it is an illustration that cannot be verified, every certificate
  * design carries a SAMPLE watermark, and there is no download or share. The Worker serves the page
  * with X-Robots-Tag: noindex.
  */
 export const SAMPLE_PATH = /^\/(?:iq\/cert\/)?sample\/?$/;
-function samplePayload(lang: string, name: string): IQCertificatePayload {
+const SAMPLE_NAME = 'John Doe';
+function samplePayload(lang: string): IQCertificatePayload {
   return {
     id: 'SAMPLE',
-    n: name,
+    n: SAMPLE_NAME,
     s: 118,
     d: '2026.01.01',
     m: [74, 69, 63, 76, 60, 71, 73], // Pattern, Spatial, Numerical, Logic, Memory, Planning, Attention
@@ -66,7 +67,7 @@ class VerificationApp {
       const t = getVerifyI18n(lang);
       this.isSample = true;
       this.isAuthentic = false;
-      this.payload = samplePayload(lang, t.sampleName);
+      this.payload = samplePayload(lang);
       document.documentElement.lang = lang === 'cn' ? 'zh-CN' : lang === 'zh' ? 'zh-TW' : lang;
       document.title = `${t.sampleTitle} | AREALME IQ`;
       this.render();
@@ -361,13 +362,7 @@ class VerificationApp {
 
   private drawCertificate(): void {
     if (!this.certCtx) return;
-    // The certificate engine draws the name letter by letter, which breaks right-to-left scripts
-    // (Arabic loses its joining, Hebrew comes out reversed), so the sample's image uses the English
-    // placeholder there; the page text keeps the localized one.
-    const payload = this.isSample && ['ar', 'he'].includes(normalizeLang(this.payload.l))
-      ? { ...this.payload, n: getVerifyI18n('en').sampleName }
-      : this.payload;
-    renderCertificate(this.certCtx, this.selectedDesign, payload, window.location.href);
+    renderCertificate(this.certCtx, this.selectedDesign, this.payload, window.location.href);
     if (this.isSample) this.drawSampleMark(this.certCtx);
   }
 

@@ -90,13 +90,18 @@ npm run preview
 
 ### Sample certificate
 `/iq/cert/sample?lang=<code>` shows a clearly labelled example for the IQ test page to link to (owner, 2026-11-08):
-a "Your Name" placeholder, score 118, a red "Sample certificate" banner saying it is an illustration that cannot be
-verified, a SAMPLE tag by the name and a SAMPLE watermark across every certificate design; no download, no share,
-no disclaimer about link data. It reads no token and checks nothing, so it creates no record. The Worker serves it
-with `X-Robots-Tag: noindex`. Languages: the verifier's 13 (others show English). In Arabic and Hebrew the
-certificate image uses the English placeholder, because the engine draws letter-spaced text glyph by glyph, which
-breaks right-to-left scripts (real certificates with Arabic or Hebrew names have the same problem). Opening the
+the placeholder name "John Doe" (owner), score 118, a red "Sample certificate" banner saying it is an illustration
+that cannot be verified, a SAMPLE tag by the name and a SAMPLE watermark across every certificate design; no
+download, no share, no disclaimer about link data. It reads no token and checks nothing, so it creates no record.
+The Worker serves it with `X-Robots-Tag: noindex`. Languages: the verifier's 13 (others show English). Opening the
 verifier with no token at all still shows the old demo certificate (unchanged).
+
+### Names in shaped scripts (2.3.0)
+Letter-spaced text used to be drawn glyph by glyph, so names in Arabic lost their joining and came out reversed,
+Hebrew came out reversed, and Indic and Thai names lost their vowel signs (dotted circles). `isShapedText`
+(`src/engine/renderers/common.ts`) now sends such text (right-to-left and joining scripts, combining marks, joiners,
+emoji) through one `fillText` call without letter-spacing. Latin, Greek, Cyrillic, CJK and Hangul are drawn exactly
+as before (checked pixel for pixel in all three designs). `npm test` runs `tests/shaped-text.mjs`.
 
 ### Deploy to Cloudflare
 ```bash

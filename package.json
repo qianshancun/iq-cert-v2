@@ -1,6 +1,6 @@
 {
   "name": "iq-cert-v2",
-  "version": "2.2.2",
+  "version": "2.3.0",
   "description": "Next-generation ARealMe IQ Certificate Engine, Verification Portal, and Cloudflare Worker",
   "main": "dist/iq-cert.js",
   "type": "module",
@@ -12,6 +12,7 @@
     "dev:engine": "node scripts/build-engine.mjs --watch",
     "dev:verify": "node scripts/build-verify.mjs --watch",
     "preview": "node scripts/preview-server.mjs",
+    "test": "node tests/reference-token.mjs && node tests/shaped-text.mjs",
     "deploy:worker": "npm run build && wrangler deploy",
     "deploy:preview": "npm run build && wrangler deploy --config wrangler.preview.jsonc"
   },

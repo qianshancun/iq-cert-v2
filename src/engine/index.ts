@@ -41,7 +41,7 @@ export function initEngine(): void {
   const fontsReady = ensureCertFonts();
 
   window.ArealmeCert = {
-    version: '2.2.2',
+    version: '2.3.0',
     fontsReady,
     start(data: IQCertificateStartData, _options?: Record<string, unknown>) {
       const modal = new CertificateModal(data);

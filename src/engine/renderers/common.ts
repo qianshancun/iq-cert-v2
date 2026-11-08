@@ -150,6 +150,19 @@ export function withFontPx(fontSpec: string, px: number): string {
   return fontSpec.replace(/(\d+(?:\.\d+)?)px/, `${px}px`);
 }
 
+/**
+ * Text that must be shaped or ordered as one run: right-to-left and joining scripts (Arabic, Hebrew,
+ * Syriac, Thaana, N'Ko, Mongolian...), anything with combining marks (Indic and Thai vowel signs and
+ * viramas, decomposed accents), joiners, variation selectors and emoji. Letter-spacing it glyph by
+ * glyph breaks it: Arabic loses its joining, Hebrew comes out reversed, marks land beside their base
+ * letter. Such text is drawn in one piece, without letter-spacing. Latin, Greek, Cyrillic, CJK and
+ * Hangul keep their spacing.
+ */
+const SHAPED_TEXT = /\p{M}|\p{Script=Arabic}|\p{Script=Hebrew}|\p{Script=Syriac}|\p{Script=Thaana}|\p{Script=Nko}|\p{Script=Samaritan}|\p{Script=Mandaic}|\p{Script=Mongolian}|\p{Script=Adlam}|\p{Join_Control}|\p{Variation_Selector}|\p{Extended_Pictographic}/u;
+export function isShapedText(text: string): boolean {
+  return SHAPED_TEXT.test(text);
+}
+
 /** Width of a run including letter-spacing (no trailing space after the last glyph). */
 export function measureTracked(
   ctx: CanvasRenderingContext2D,
@@ -162,6 +175,7 @@ export function measureTracked(
   ctx.font = fontSpec;
   const base = ctx.measureText(text).width;
   ctx.restore();
+  if (isShapedText(text)) return base;
   const glyphs = Array.from(text).length;
   return base + Math.max(0, glyphs - 1) * tracking * parseFontPx(fontSpec);
 }
@@ -198,7 +212,7 @@ export function drawType(
   ctx.textAlign = 'left';
   ctx.textBaseline = style.baseline ?? 'alphabetic';
 
-  if (!tracking) {
+  if (!tracking || isShapedText(text)) {
     ctx.fillText(text, startX, y);
   } else {
     // Position each glyph from the kerned width of its prefix so pair kerning survives tracking.
